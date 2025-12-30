@@ -7,12 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "init-db": "ts-node scripts/init-database.ts",
-    "create-tables": "ts-node scripts/create-tables.ts",
-    "create-admin": "ts-node scripts/create-admin.ts",
-    "seed-categories": "ts-node scripts/seed-categories.ts",
-    "seed-articles": "ts-node scripts/seed-articles.ts"
+    "lint": "eslint"
   },
   "dependencies": {
     "@tiptap/pm": "^3.6.6",
