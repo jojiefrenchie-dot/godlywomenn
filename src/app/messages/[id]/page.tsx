@@ -98,7 +98,7 @@ export default function MessagePage({
     loadParams();
   }, [params, searchParams]);
 
-  const markConversationAsRead = async (convId: string) => {
+  const markConversationAsRead = React.useCallback(async (convId: string) => {
     try {
       const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
       await fetch(`${djangoApi}/api/messaging/conversations/${convId}/mark_as_read/`, {
@@ -110,7 +110,7 @@ export default function MessagePage({
     } catch (err) {
       console.error('Error marking as read:', err);
     }
-  };
+  }, [session]);
   
   const fetchMessagesForConversation = React.useCallback(async (convId: string) => {
     try {
@@ -193,7 +193,7 @@ export default function MessagePage({
     }, 2000);
     
     return () => clearInterval(pollInterval);
-  }, [conversationId, fetchMessagesForConversation]);
+  }, [conversationId, fetchMessagesForConversation, markConversationAsRead]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
