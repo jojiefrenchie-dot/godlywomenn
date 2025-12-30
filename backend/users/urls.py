@@ -1,0 +1,17 @@
+from django.urls import path
+from .views import RegisterView, MeView, UserDetailView, CustomTokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView
+from .password_reset import forgot_password, reset_password
+from . import views_stats
+
+urlpatterns = [
+    path('register/', RegisterView.as_view(), name='register'),
+    path('me/', MeView.as_view(), name='me'),
+    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('forgot-password/', forgot_password, name='forgot_password'),
+    path('reset-password/', reset_password, name='reset_password'),
+    path('<str:user_id>/', UserDetailView.as_view(), name='user-detail'),
+    path('<str:user_id>/stats/', views_stats.user_stats, name='user-stats'),
+    path('<str:user_id>/activity/', views_stats.user_activity, name='user-activity'),
+]
