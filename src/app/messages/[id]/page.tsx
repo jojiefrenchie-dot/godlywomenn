@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -98,7 +98,7 @@ export default function MessagePage({
     loadParams();
   }, [params, searchParams]);
 
-  const markConversationAsRead = React.useCallback(async (convId: string) => {
+  const markConversationAsRead = useCallback(async (convId: string) => {
     try {
       const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
       await fetch(`${djangoApi}/api/messaging/conversations/${convId}/mark_as_read/`, {
@@ -112,7 +112,7 @@ export default function MessagePage({
     }
   }, [session]);
   
-  const fetchMessagesForConversation = React.useCallback(async (convId: string) => {
+  const fetchMessagesForConversation = useCallback(async (convId: string) => {
     try {
       const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
       const res = await fetch(`${djangoApi}/api/messaging/conversations/${convId}/`, {
