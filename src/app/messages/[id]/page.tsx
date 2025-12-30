@@ -69,7 +69,6 @@ export default function MessagePage({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [otherUserId, setOtherUserId] = useState<string>('');
-  const [otherUser, setOtherUser] = useState<User | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [productData, setProductData] = useState<ProductData | null>(null);
