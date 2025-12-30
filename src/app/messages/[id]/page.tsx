@@ -272,12 +272,10 @@ export default function MessagePage({
     );
   }
 
-  if (!conversationImage
-                    src={buildAbsoluteUrl(DJANGO_API, otherUser.image)}
-                    alt={otherUser.name || 'User avatar'}
-                    className="w-10 h-10 rounded-full object-cover"
-                    width={40}
-                    height={40}div>
+  if (!conversation) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-red-600">Failed to load conversation</div>
       </div>
     );
   }
@@ -296,23 +294,23 @@ export default function MessagePage({
             {otherUser && (
               <>
                 {otherUser.image && (
-                  <img
+                  <Image
                     src={buildAbsoluteUrl(DJANGO_API, otherUser.image)}
-                    alt={otherUser.name}
+                    alt={otherUser.name || 'User avatar'}
                     className="w-10 h-10 rounded-full object-cover"
+                    width={40}
+                    height={40}
                   />
                 )}
                 <div>
                   <h2 className="font-semibold text-gray-900">{otherUser.name || otherUser.email}</h2>
                   <p className="text-sm text-gray-500">Online</p>
                 </div>
-              </> relative">
-                    <Image 
-                      src={buildAbsoluteUrl(DJANGO_API, msg.attachment)} 
-                      alt="Shared image"
-                      className="rounded max-h-96 object-contain"
-                      width={400}
-                      height={400}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 max-w-4xl mx-auto w-full">
@@ -332,11 +330,13 @@ export default function MessagePage({
                 {msg.content && <p>{msg.content}</p>}
                 
                 {msg.attachment && msg.attachment_type === 'image' && (
-                  <div className="mt-2 max-w-sm">
-                    <img 
+                  <div className="mt-2 max-w-sm relative">
+                    <Image 
                       src={buildAbsoluteUrl(DJANGO_API, msg.attachment)} 
                       alt="Shared image"
                       className="rounded max-h-96 object-contain"
+                      width={400}
+                      height={400}
                     />
                   </div>
                 )}
