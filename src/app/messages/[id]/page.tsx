@@ -181,7 +181,7 @@ export default function MessagePage({
     };
 
     fetchOrCreateConversation();
-  }, [session, otherUserId, productData]);
+  }, [session, otherUserId, productData, markConversationAsRead]);
 
   useEffect(() => {
     if (!conversationId) return;
