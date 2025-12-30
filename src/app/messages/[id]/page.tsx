@@ -184,28 +184,6 @@ export default function MessagePage({
     fetchOrCreateConversation();
   }, [session, otherUserId]);
 
-  const fetchMessagesForConversation = async (convId: string) => {
-    try {
-      const res = await fetch(`${DJANGO_API}/api/conversations/${convId}/messages/`);
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data);
-      }
-    } catch (err) {
-      console.error('Error fetching messages:', err);
-    }
-  };
-
-  const markConversationAsRead = async (convId: string) => {
-    try {
-      await fetch(`${DJANGO_API}/api/conversations/${convId}/mark-read/`, {
-        method: 'PATCH',
-      });
-    } catch (err) {
-      console.error('Error marking as read:', err);
-    }
-  };
-
   useEffect(() => {
     if (!conversationId) return;
     
