@@ -112,7 +112,7 @@ export default function MessagePage({
     }
   };
   
-  const fetchMessagesForConversation = async (convId: string) => {
+  const fetchMessagesForConversation = React.useCallback(async (convId: string) => {
     try {
       const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
       const res = await fetch(`${djangoApi}/api/messaging/conversations/${convId}/`, {
@@ -127,7 +127,7 @@ export default function MessagePage({
     } catch (err) {
       console.error('Error fetching messages:', err);
     }
-  };
+  }, [session]);
 
   useEffect(() => {
     if (!session || !otherUserId) return;
@@ -181,7 +181,7 @@ export default function MessagePage({
     };
 
     fetchOrCreateConversation();
-  }, [session, otherUserId]);
+  }, [session, otherUserId, productData]);
 
   useEffect(() => {
     if (!conversationId) return;
@@ -193,7 +193,7 @@ export default function MessagePage({
     }, 2000);
     
     return () => clearInterval(pollInterval);
-  }, [conversationId]);
+  }, [conversationId, fetchMessagesForConversation]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
