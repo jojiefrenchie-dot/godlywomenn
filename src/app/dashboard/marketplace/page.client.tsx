@@ -557,11 +557,7 @@ export default function DashboardMarketplace() {
   const [editing, setEditing] = useState<MarketplaceItem | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
-  async function fetchItems() {
+  const fetchItems = React.useCallback(async () => {
     setLoading(true);
     try {
       // Fetch all items, but we'll only show the user's own items
@@ -576,7 +572,11 @@ export default function DashboardMarketplace() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [session?.user?.email]);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
 
   async function handleSave(data: Partial<MarketplaceItem> | FormData) {
     try {
@@ -697,14 +697,13 @@ export default function DashboardMarketplace() {
             {items.map((item) => (
               <div key={item.id} className="bg-white rounded shadow-sm border overflow-hidden">
                 {item.image && (
-                  <div className="w-full h-48 bg-gray-200 overflow-hidden">
-                    <img
+                  <div className="w-full h-48 bg-gray-200 overflow-hidden relative">
+                    <Image
                       src={buildAbsoluteUrl(DJANGO_API, item.image)}
-                      alt={item.title}
+                      alt={item.title || 'Marketplace item'}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
+                      fill
+                      onError={() => {
                         console.error('Failed to load image:', item.image);
                       }}
                     />

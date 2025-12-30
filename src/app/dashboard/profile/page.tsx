@@ -63,8 +63,10 @@ export default function EditProfilePage() {
       }
     };
 
-    fetchProfile();
-  }, []);
+    if (session) {
+      fetchProfile();
+    }
+  }, [session]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -18,5 +18,5 @@ export default function ClientImage(props: Props) {
     return <div className={props.className} style={{ backgroundColor: '#e5e7eb' }} />;
   }
 
-  return <Image {...(props as ImageProps)} />;
+  return <Image {...(props as ImageProps)} alt={props.alt || 'image'} />;
 }
