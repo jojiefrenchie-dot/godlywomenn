@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
@@ -557,7 +557,7 @@ export default function DashboardMarketplace() {
   const [editing, setEditing] = useState<MarketplaceItem | null>(null);
   const [showForm, setShowForm] = useState(false);
 
-  const fetchItems = React.useCallback(async () => {
+  const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
       // Fetch all items, but we'll only show the user's own items
