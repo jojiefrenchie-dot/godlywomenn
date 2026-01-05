@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: godlywomen-backend
+    env: python
+    region: ohio
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: cd backend && gunicorn backend_project.wsgi:application
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: "*.render.com,localhost"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://godlywomen.vercel.app"
+
+databases:
+  - name: godlywomen_db
+    engine: postgres
+    plan: free
+    region: ohio
