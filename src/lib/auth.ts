@@ -1,6 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { refreshAccessToken } from "./refreshToken";
+import { getApiUrl } from "./api-url";
 
 const DJANGO_API = process.env.DJANGO_API_URL || process.env.NEXT_PUBLIC_DJANGO_API || "http://127.0.0.1:8000";
 
@@ -33,7 +34,8 @@ export const authOptions: NextAuthOptions = {
 
         try {
           // Call Django token endpoint to get JWT
-          const tokenRes = await fetch(`${DJANGO_API}/api/auth/token/`, {
+          const tokenUrl = getApiUrl('/api/auth/token/');
+          const tokenRes = await fetch(tokenUrl, {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
@@ -55,7 +57,8 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Fetch user info from Django
-          const userRes = await fetch(`${DJANGO_API}/api/auth/me/`, {
+          const userUrl = getApiUrl('/api/auth/me/');
+          const userRes = await fetch(userUrl, {
             method: 'GET',
             headers: { 
               'Authorization': `Bearer ${access}`,
