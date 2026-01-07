@@ -1,18 +1,19 @@
 /**
  * Get the backend API URL
- * - On Render with both services: use localhost:8000 for server-side (internal)
- * - For client-side API routes: use relative paths (same domain)
+ * - On Render: backend runs on localhost:10000 (internal routing)
+ * - In development: use localhost:8000
+ * - For client-side API routes: use relative paths
  */
 export function getBackendUrl(isServerSide = false) {
-  // In development, use environment variable or localhost
+  // In development, use environment variable or localhost:8000
   if (process.env.NODE_ENV === 'development') {
     return process.env.DJANGO_API_URL || process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
   }
   
   // In production on Render
-  // For server-side (NextAuth, token refresh): use localhost:8000 (internal service routing)
+  // For server-side (NextAuth, token refresh): use localhost:10000 (Render's default port)
   if (isServerSide) {
-    return 'http://localhost:8000';
+    return 'http://localhost:10000';
   }
   
   // For client-side API routes: return empty (use relative paths)
