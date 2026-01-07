@@ -34,7 +34,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           // Call Django token endpoint to get JWT
-          const tokenUrl = getApiUrl('/api/auth/token/');
+          const tokenUrl = getApiUrl('/api/auth/token/', true); // true = server-side
           const tokenRes = await fetch(tokenUrl, {
             method: 'POST',
             headers: { 
@@ -57,7 +57,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Fetch user info from Django
-          const userUrl = getApiUrl('/api/auth/me/');
+          const userUrl = getApiUrl('/api/auth/me/', true); // true = server-side
           const userRes = await fetch(userUrl, {
             method: 'GET',
             headers: { 

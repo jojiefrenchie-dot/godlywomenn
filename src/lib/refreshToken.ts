@@ -1,4 +1,4 @@
-const DJANGO_API = process.env.DJANGO_API_URL || process.env.NEXT_PUBLIC_DJANGO_API || "http://127.0.0.1:8000";
+import { getApiUrl } from './api-url';
 
 export async function refreshAccessToken(token: any) {
   try {
@@ -13,7 +13,8 @@ export async function refreshAccessToken(token: any) {
     console.log('Attempting to refresh token');
 
     // Try to refresh the token
-    const response = await fetch(`${DJANGO_API}/api/auth/token/refresh/`, {
+    const refreshUrl = getApiUrl('/api/auth/token/refresh/', true); // true = server-side
+    const response = await fetch(refreshUrl, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
