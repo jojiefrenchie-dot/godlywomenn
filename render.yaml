@@ -1,20 +1,30 @@
 services:
   - type: web
-    name: godlywomen-backend
-    env: python
+    name: godlywomen
+    env: node
     region: ohio
     plan: free
-    buildCommand: cd backend && pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
-    startCommand: cd backend && gunicorn backend_project.wsgi:application
+    buildCommand: npm install && npm run build && cd backend && pip install -r requirements.txt && python manage.py migrate && python manage.py collectstatic --noinput
+    startCommand: cd backend && gunicorn backend_project.wsgi:application --bind 0.0.0.0:10000 &amp; npm start
     envVars:
       - key: DEBUG
         value: "False"
       - key: SECRET_KEY
         generateValue: true
+      - key: NEXTAUTH_SECRET
+        generateValue: true
       - key: ALLOWED_HOSTS
         value: "*.render.com,localhost"
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://godlywomen.vercel.app"
+        value: "https://godlywomenn.onrender.com"
+      - key: NEXT_PUBLIC_DJANGO_API
+        value: "http://localhost:10000"
+      - key: DJANGO_API_URL
+        value: "http://localhost:10000"
+      - key: NEXTAUTH_URL
+        value: "https://godlywomenn.onrender.com"
+      - key: PYTHONUNBUFFERED
+        value: "1"
 
 databases:
   - name: godlywomen_db
