@@ -4,8 +4,8 @@ import { getApiUrl } from "@/lib/api-url";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    // Use relative path (client-side) - the request goes through the same service
-    const apiUrl = getApiUrl('/api/auth/register/');
+    // This is server-side, so use absolute URL
+    const apiUrl = getApiUrl('/api/auth/register/', true);
 
     const resp = await fetch(apiUrl, {
       method: 'POST',
