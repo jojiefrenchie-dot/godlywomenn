@@ -40,17 +40,17 @@ if not SKIP_MODEL_LOADING:
     except Exception as e:
         print(f"[AI Services] Warning: Could not load FLAN-T5-Large: {e}")
 
-try:
-    from detoxify import Detoxify
-    
-    # Detoxify for content moderation
-    print("[AI Services] Loading Detoxify model...")
-    detoxify_model = Detoxify("original", device="cpu")
-    print("[AI Services] Detoxify model loaded successfully")
-except ImportError as e:
-    print(f"[AI Services] Warning: Detoxify not installed: {e}")
-except Exception as e:
-    print(f"[AI Services] Warning: Could not load Detoxify: {e}")
+    try:
+        from detoxify import Detoxify
+        
+        # Detoxify for content moderation
+        print("[AI Services] Loading Detoxify model...")
+        detoxify_model = Detoxify("original", device="cpu")
+        print("[AI Services] Detoxify model loaded successfully")
+    except ImportError as e:
+        print(f"[AI Services] Warning: Detoxify not installed: {e}")
+    except Exception as e:
+        print(f"[AI Services] Warning: Could not load Detoxify: {e}")
 
 MODELS_LOADED = flan_t5_pipeline is not None or detoxify_model is not None
 
