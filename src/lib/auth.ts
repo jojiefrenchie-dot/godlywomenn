@@ -8,7 +8,7 @@ const DJANGO_API = process.env.DJANGO_API_URL || process.env.NEXT_PUBLIC_DJANGO_
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 hours
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: false,
@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
     error: "/login",
   },
   jwt: {
-    maxAge: 24 * 60 * 60, // 24 hours
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
   providers: [
     CredentialsProvider({
