@@ -1,22 +1,29 @@
 /**
  * Get the backend API URL
- * - On Render: backend runs on localhost:10000 (internal routing)
- * - In development: use localhost:8000
+ * - In development: use DJANGO_API_URL or localhost:8000
+ * - In production: use NEXT_PUBLIC_DJANGO_API environment variable
  * - For client-side API routes: use relative paths
  */
 export function getBackendUrl(isServerSide = false) {
-  // In development, use environment variable or localhost:8000
+  // Use environment variables first
+  const backendUrl = process.env.DJANGO_API_URL || process.env.NEXT_PUBLIC_DJANGO_API;
+  
+  if (backendUrl) {
+    return backendUrl;
+  }
+  
+  // Fallback for development
   if (process.env.NODE_ENV === 'development') {
-    return process.env.DJANGO_API_URL || process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
+    return 'http://localhost:8000';
   }
   
-  // In production on Render
-  // For server-side (NextAuth, token refresh): use localhost:10000 (Render's default port)
-  if (isServerSide) {
-    return 'http://localhost:10000';
+  // For client-side API routes in production: return empty (use relative paths)
+  if (!isServerSide) {
+    return '';
   }
   
-  // For client-side API routes: return empty (use relative paths)
+  // No backend URL available - this will cause errors
+  console.warn('No DJANGO_API_URL or NEXT_PUBLIC_DJANGO_API configured');
   return '';
 }
 
