@@ -55,7 +55,7 @@ export default function MarketplacePage() {
     async function fetchListings() {
       try {
         setError(null);
-        const url = `${DJANGO_API}/api/marketplace/`;
+        const url = `/api/marketplace`;
         console.log('Fetching from:', url);
         
         const res = await fetch(url, {
@@ -147,7 +147,7 @@ export default function MarketplacePage() {
           <p className="text-red-700 font-medium">Error loading listings</p>
           <p className="text-red-600 text-sm mt-1">{error}</p>
           <p className="text-red-600 text-sm mt-2">
-            Please make sure the backend server is running and accessible at {DJANGO_API}
+            Please make sure the backend server is running and accessible at {DJANGO_API} marketplace
           </p>
         </div>
       )}
