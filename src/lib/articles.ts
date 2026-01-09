@@ -322,13 +322,26 @@ export async function createArticle(data: {
 
 export async function getCategories() {
   try {
-    // Use local proxy route instead of calling Django directly
-    const response = await fetch('/api/categories', {
+    // Determine if we're on server or client
+    const isServer = typeof window === 'undefined';
+    
+    let url: string;
+    if (isServer) {
+      // Server-side: use absolute URL to Django
+      const djangoApi = process.env.DJANGO_API_URL || process.env.NEXT_PUBLIC_DJANGO_API || 'http://127.0.0.1:8000';
+      url = `${djangoApi}/api/categories/`;
+    } else {
+      // Client-side: use relative URL to Next.js proxy
+      url = '/api/categories';
+    }
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
       }
     });
+    
     if (!response.ok) {
       // If unauthorized, return empty list so the create page can still render
       if (response.status === 401) {
