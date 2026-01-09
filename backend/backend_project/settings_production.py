@@ -174,7 +174,8 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration - restrict to specific origins
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+CORS_ALLOWED_ORIGINS_SETTING = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,https://godlywomenn.onrender.com')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_SETTING.split(',')]
 CORS_ALLOW_CREDENTIALS = True
 
 # Security Headers
