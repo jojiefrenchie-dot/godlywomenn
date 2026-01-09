@@ -322,8 +322,8 @@ export async function createArticle(data: {
 
 export async function getCategories() {
   try {
-    // Call Django API directly to avoid circular dependency with NextAuth session
-    const response = await fetchWithAuth(getDjangoApiUrl('/api/categories/'), {
+    // Use local proxy route instead of calling Django directly
+    const response = await fetch('/api/categories', {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
