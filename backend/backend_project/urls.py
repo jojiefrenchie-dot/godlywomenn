@@ -21,6 +21,7 @@ def index(request):
                 <li><a href="/admin/">/admin/</a></li>
                 <li><a href="/api/auth/">/api/auth/</a></li>
                 <li><a href="/api/articles/">/api/articles/</a></li>
+                <li><a href="/api/marketplace/">/api/marketplace/</a></li>
                 <li><a href="/api/categories/">/api/categories/</a></li>
                 <li><a href="/api/tags/">/api/tags/</a></li>
                 <li><a href="/api/ai/">/api/ai/</a></li>
