@@ -1,9 +1,8 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
+import { getDjangoApiUrl } from '@/lib/api';
 import type { Session, AuthOptions } from 'next-auth';
-
-const DJANGO_API = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -29,7 +28,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Access token required' }, { status: 401 });
     }
 
-    const resp = await fetch(`${DJANGO_API}/api/articles/${encodeURIComponent(id)}/`, {
+    const resp = await fetch(getDjangoApiUrl(`/api/articles/${encodeURIComponent(id)}/`), {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -58,7 +57,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     const session = (await getServerSession(authOptions as unknown as AuthOptions)) as Session | null;
   const token = (session as unknown as { accessToken?: string })?.accessToken;
 
-    const resp = await fetch(`${DJANGO_API}/api/articles/${id}/`, {
+    const resp = await fetch(getDjangoApiUrl(`/api/articles/${id}/`), {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

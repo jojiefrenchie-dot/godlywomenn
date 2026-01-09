@@ -1,8 +1,7 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-
-const DJANGO_API = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
+import { getDjangoApiUrl } from '@/lib/api';
 
 export async function PATCH(
   request: NextRequest,
@@ -35,7 +34,7 @@ export async function PATCH(
     }
 
     // Make request to Django API
-  const response = await fetch(`${DJANGO_API}/api/articles/${params.id}/`, {
+  const response = await fetch(getDjangoApiUrl(`/api/articles/${params.id}/`), {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -55,7 +54,7 @@ export async function PATCH(
       }
 
       // Retry with new token
-  const retryResponse = await fetch(`${DJANGO_API}/api/articles/${params.id}/`, {
+  const retryResponse = await fetch(getDjangoApiUrl(`/api/articles/${params.id}/`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
