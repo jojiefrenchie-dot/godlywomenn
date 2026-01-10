@@ -9,6 +9,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
     maxAge: 7 * 24 * 60 * 60, // 7 days
+    updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: false,
@@ -19,6 +20,36 @@ export const authOptions: NextAuthOptions = {
   },
   jwt: {
     maxAge: 7 * 24 * 60 * 60, // 7 days
+  },
+  cookies: {
+    sessionToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax' as const,
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60, // 7 days
+      }
+    },
+    callbackUrl: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.callback-url`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax' as const,
+        path: '/',
+      }
+    },
+    csrfToken: {
+      name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax' as const,
+        path: '/',
+      }
+    },
   },
   providers: [
     CredentialsProvider({
@@ -33,8 +64,12 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          console.log('[AUTHORIZE] Attempting to authenticate:', credentials.email);
+          
           // Call Django token endpoint to get JWT
           const tokenUrl = getApiUrl('/api/auth/token/', true); // true = server-side
+          console.log('[AUTHORIZE] Token URL:', tokenUrl);
+          
           const tokenRes = await fetch(tokenUrl, {
             method: 'POST',
             headers: { 
@@ -45,19 +80,25 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!tokenRes.ok) {
-            console.error('Django token endpoint returned', tokenRes.status);
+            console.error('[AUTHORIZE] Django token endpoint returned', tokenRes.status);
             const errorData = await tokenRes.json().catch(() => ({}));
-            throw new Error(errorData.detail || "Invalid credentials");
+            console.error('[AUTHORIZE] Error data:', errorData);
+            throw new Error(errorData.detail || errorData.message || "Invalid credentials");
           }
 
           const tokenData = await tokenRes.json();
           const { access, refresh } = tokenData;
           if (!access || !refresh) {
+            console.error('[AUTHORIZE] No tokens in response:', tokenData);
             throw new Error("No tokens in response");
           }
 
+          console.log('[AUTHORIZE] Got tokens from Django');
+
           // Fetch user info from Django
           const userUrl = getApiUrl('/api/auth/me/', true); // true = server-side
+          console.log('[AUTHORIZE] User URL:', userUrl);
+          
           const userRes = await fetch(userUrl, {
             method: 'GET',
             headers: { 
@@ -67,11 +108,12 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!userRes.ok) {
-            console.error('Failed to fetch user from Django me endpoint', userRes.status);
+            console.error('[AUTHORIZE] Failed to fetch user from Django me endpoint', userRes.status);
             throw new Error("Failed to load user info");
           }
 
           const user = await userRes.json();
+          console.log('[AUTHORIZE] Got user info:', user.email);
 
           // Return user with tokens
           return {
@@ -83,7 +125,7 @@ export const authOptions: NextAuthOptions = {
             refreshToken: refresh,
           };
         } catch (err) {
-          console.error('Authorize error:', err);
+          console.error('[AUTHORIZE] Error:', err);
           throw new Error(err instanceof Error ? err.message : "Authentication failed");
         }
       },
@@ -117,9 +159,10 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       // If initial sign in
       if (user) {
+        console.log('[JWT CALLBACK] New sign-in, user:', user.email);
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
@@ -130,12 +173,13 @@ export const authOptions: NextAuthOptions = {
           token.accessTokenExpires = Date.now() + 900 * 1000; // 15 minutes from now
           token.refreshToken = (user as any).refreshToken;
           token.error = undefined;
+          console.log('[JWT CALLBACK] Tokens set, expires in 15 minutes');
         }
       }
 
       // If the access token has expired, attempt to refresh
       if (!token.accessTokenExpires || Date.now() >= (token.accessTokenExpires as number)) {
-        console.log('[JWT Callback] Token expired, attempting refresh');
+        console.log('[JWT Callback] Token expired, attempting refresh, email:', token.email);
         return refreshAccessToken(token);
       }
 

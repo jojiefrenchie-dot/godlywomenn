@@ -22,7 +22,15 @@ function LoginPageContent() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
+    // Validate inputs
+    if (!email || !password) {
+      setError("Email and password are required");
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      console.log('[LOGIN] Attempting to sign in:', email);
       const cb = (searchParams?.get('callbackUrl') as string) || '/dashboard';
 
       const result = await signIn("credentials", {
@@ -33,18 +41,25 @@ function LoginPageContent() {
       });
 
       if (result?.error) {
+        console.error('[LOGIN] Sign in error:', result.error);
         setError("Invalid email or password. Please check your credentials.");
         setIsLoading(false);
         return;
       }
 
       if (result?.ok) {
-        // Navigate to callback or dashboard
-        router.push(cb);
-        router.refresh();
+        console.log('[LOGIN] Sign in successful, redirecting to:', cb);
+        // Small delay to ensure session is fully stored
+        setTimeout(() => {
+          router.push(cb);
+          router.refresh();
+        }, 100);
+      } else {
+        setError("An error occurred. Please try again.");
+        setIsLoading(false);
       }
     } catch (error) {
-      console.error("Sign in error:", error);
+      console.error("[LOGIN] Error:", error);
       setError("An error occurred. Please try again.");
       setIsLoading(false);
     }
