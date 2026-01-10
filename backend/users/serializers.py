@@ -1,5 +1,7 @@
+from django.contrib.auth import authenticate
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User
 
 
@@ -27,9 +29,18 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password')
         try:
-            print(f"[REGISTER SERIALIZER] Creating user with email: {validated_data.get('email')}")
+            email = validated_data.get('email')
+            print(f"[REGISTER SERIALIZER] Creating user")
+            print(f"[REGISTER SERIALIZER]   Email: {email}")
+            print(f"[REGISTER SERIALIZER]   Password length: {len(password) if password else 0}")
+            print(f"[REGISTER SERIALIZER]   Password: {password}")
             user = User.objects.create_user(password=password, **validated_data)
-            print(f"[REGISTER SERIALIZER] ✓ User created successfully")
+            print(f"[REGISTER SERIALIZER] ✓ User created successfully: {user.email}")
+            
+            # Verify the password was set correctly
+            is_correct = user.check_password(password)
+            print(f"[REGISTER SERIALIZER] Password verification: {is_correct}")
+            
             return user
         except Exception as e:
             print(f"[REGISTER SERIALIZER] ✗ Error: {str(e)}")
@@ -47,15 +58,45 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             del self.fields['username']
     
     def validate(self, attrs):
-        # SimpleJWT expects attrs with the username_field (which is 'email')
-        print(f"[TOKEN SERIALIZER] Attempting authentication with email: {attrs.get('email', 'NO_EMAIL')}")
+        """Override to properly handle email-based authentication"""
+        email = attrs.get('email')
+        password = attrs.get('password')
+        
+        print(f"[TOKEN SERIALIZER] Validating email: {email}")
+        
+        if not email or not password:
+            raise serializers.ValidationError("Email and password are required")
+        
         try:
-            validated = super().validate(attrs)
-            print(f"[TOKEN SERIALIZER] Authentication successful")
-            return validated
+            # Get user by email
+            user = User.objects.get(email=email)
+            print(f"[TOKEN SERIALIZER] User found: {user.email}, is_active: {user.is_active}")
+            
+            # Check password
+            if not user.check_password(password):
+                print(f"[TOKEN SERIALIZER] Password mismatch for user {email}")
+                raise serializers.ValidationError("Invalid email or password")
+            
+            if not user.is_active:
+                print(f"[TOKEN SERIALIZER] User is inactive: {email}")
+                raise serializers.ValidationError("User account is inactive")
+            
+            # Generate tokens manually
+            refresh = RefreshToken.for_user(user)
+            data = {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }
+            print(f"[TOKEN SERIALIZER] ✓ Authentication successful for {email}")
+            return data
+            
+        except User.DoesNotExist:
+            print(f"[TOKEN SERIALIZER] User not found: {email}")
+            raise serializers.ValidationError("Invalid email or password")
         except Exception as e:
-            print(f"[TOKEN SERIALIZER] Authentication failed: {str(e)}")
-            print(f"[TOKEN SERIALIZER] Fields: {list(attrs.keys())}")
+            print(f"[TOKEN SERIALIZER] ✗ Unexpected error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             raise
 
 
