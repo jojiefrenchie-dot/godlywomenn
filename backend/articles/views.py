@@ -343,10 +343,15 @@ class ArticleImageUploadView(generics.CreateAPIView):
             # Save file to storage via ImageField
             article.featured_image.save(file_obj.name, file_obj, save=False)
 
+            print(f"[IMAGE UPLOAD] Image saved for temporary article")
+            print(f"[IMAGE UPLOAD] Featured image path: {article.featured_image}")
+            print(f"[IMAGE UPLOAD] Featured image URL: {article.featured_image.url if hasattr(article.featured_image, 'url') else 'N/A'}")
+
             # Determine a normalized URL to return (always start with '/media/')
             try:
                 url = article.featured_image.url
-            except Exception:
+            except Exception as e:
+                print(f"[IMAGE UPLOAD] Error getting URL from field: {e}")
                 # Fallback: build URL from stored name
                 stored = str(article.featured_image)
                 stored = stored.lstrip('/')
@@ -358,9 +363,13 @@ class ArticleImageUploadView(generics.CreateAPIView):
             if not url.startswith('/'):
                 url = '/' + url
 
+            print(f"[IMAGE UPLOAD] Returning URL: {url}")
             return Response({'url': url}, status=status.HTTP_201_CREATED)
 
         except Exception as e:
+            print(f"[IMAGE UPLOAD] Error: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ArticleGenerateContentView(APIView):
