@@ -162,7 +162,7 @@ export default function DashboardPageClient() {
     }
   }, [session]);
 
-  if (status === "loading" || loading) {
+  if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#dc143c]"></div>
@@ -175,6 +175,14 @@ export default function DashboardPageClient() {
   return (
     <div suppressHydrationWarning className="min-h-screen bg-gradient-to-b from-white to-[#fdebd0]/20 pt-20">
       <div suppressHydrationWarning className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Loading Message */}
+        {loading && (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[#dc143c] mr-3"></div>
+            <p className="text-blue-700">Loading your dashboard...</p>
+          </div>
+        )}
+
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -194,7 +202,6 @@ export default function DashboardPageClient() {
           <p className="text-gray-600">Your journey of faith continues. What would you like to do today?</p>
         </div>
 
-        {/* Quick Actions */}
         {/* Quick Stats */}
         <div suppressHydrationWarning className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div suppressHydrationWarning className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
@@ -211,7 +218,7 @@ export default function DashboardPageClient() {
           </div>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions Section - Always Show */}
         <h2 className="text-2xl font-serif text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {quickActions.map((action) => (
