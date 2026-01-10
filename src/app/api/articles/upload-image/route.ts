@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-
-const DJANGO_API = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
+import { getDjangoApiUrl } from '@/lib/api';
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Forward the request to Django
-    const response = await fetch(`${DJANGO_API}/api/articles/upload-image/`, {
+    const response = await fetch(getDjangoApiUrl('/api/articles/upload-image/'), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

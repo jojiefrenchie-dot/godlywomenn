@@ -117,8 +117,9 @@ export default function CreateArticleClient() {
         const fd = new FormData();
         fd.append('featured_image', imageFile);
 
-        const uploadResp = await fetchWithAuth(getDjangoApiUrl('/api/articles/upload-image/'), {
+        const uploadResp = await fetch('/api/articles/upload-image', {
           method: 'POST',
+          credentials: 'include',
           body: fd,
         });
 
@@ -142,9 +143,10 @@ export default function CreateArticleClient() {
       
       console.log('Sending article creation request:', requestPayload);
       
-      const resp = await fetchWithAuth(getDjangoApiUrl('/api/articles/'), {
+      const resp = await fetch('/api/articles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(requestPayload)
       });
 
@@ -163,7 +165,8 @@ export default function CreateArticleClient() {
       
       if (!resp.ok) {
         console.error('Failed to create article via API:', { status: resp.status, response: article });
-        throw new Error(article?.error || `Failed to create article (Status: ${resp.status})`);
+        const errorMsg = article?.error || article?.detail || `Failed to create article (Status: ${resp.status})`;
+        throw new Error(errorMsg);
       }
       
       console.log('Article created successfully:', article);
@@ -171,7 +174,8 @@ export default function CreateArticleClient() {
       router.push(`/articles/${article.slug}`);
     } catch (error) {
       console.error("Error creating article:", error);
-      setUploadError(error instanceof Error ? error.message : 'Failed to create article');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create article';
+      setUploadError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
