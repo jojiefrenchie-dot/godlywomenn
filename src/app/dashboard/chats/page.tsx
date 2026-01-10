@@ -67,8 +67,7 @@ export default function ChatsPage() {
 
     const fetchConversations = async () => {
       try {
-        const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
-        const res = await fetch(`${djangoApi}/api/messaging/conversations/`, {
+        const res = await fetch('/api/messaging/conversations', {
           headers: {
             'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token}`,
           }
@@ -93,8 +92,7 @@ export default function ChatsPage() {
 
   const handleMarkAsRead = async (conversationId: string) => {
     try {
-      const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
-      await fetch(`${djangoApi}/api/messaging/conversations/${conversationId}/mark_as_read/`, {
+      await fetch(`/api/messaging/conversations/${conversationId}/mark_as_read/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token}`,
@@ -102,7 +100,7 @@ export default function ChatsPage() {
       });
       
       // Refresh conversations
-      const res = await fetch(`${djangoApi}/api/messaging/conversations/`, {
+      const res = await fetch('/api/messaging/conversations', {
         headers: {
           'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token}`,
         }

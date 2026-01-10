@@ -100,8 +100,7 @@ export default function MessagePage({
 
   const markConversationAsRead = useCallback(async (convId: string) => {
     try {
-      const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
-      await fetch(`${djangoApi}/api/messaging/conversations/${convId}/mark_as_read/`, {
+      await fetch(`/api/messaging/conversations/${convId}/mark_as_read/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token}`,
@@ -114,8 +113,7 @@ export default function MessagePage({
   
   const fetchMessagesForConversation = useCallback(async (convId: string) => {
     try {
-      const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
-      const res = await fetch(`${djangoApi}/api/messaging/conversations/${convId}/`, {
+      const res = await fetch(`/api/messaging/conversations/${convId}`, {
         headers: {
           'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token}`,
         },
@@ -134,12 +132,11 @@ export default function MessagePage({
 
     const fetchOrCreateConversation = async () => {
       try {
-        const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
         // Prefer product owner id (UUID) when product data is present, otherwise use route param
         const targetUserId = (productData && (productData as any).owner && (productData as any).owner.id) ? String((productData as any).owner.id).trim() : String(otherUserId).trim();
         console.log('Attempting to create conversation with user ID:', targetUserId, 'Type:', typeof targetUserId);
 
-        const res = await fetch(`${djangoApi}/api/messaging/conversations/start_conversation/`, {
+        const res = await fetch(`/api/messaging/conversations/start_conversation/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -201,8 +198,6 @@ export default function MessagePage({
 
     setSending(true);
     try {
-      const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
-      
       // Prepare FormData to handle both text and file
       const formData = new FormData();
       formData.append('conversation_id', conversationId);
@@ -220,7 +215,7 @@ export default function MessagePage({
         formData.append('product_data', JSON.stringify(productData));
       }
 
-      const res = await fetch(`${djangoApi}/api/messaging/messages/`, {
+      const res = await fetch(`/api/messaging/messages/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token}`,
