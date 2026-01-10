@@ -4,16 +4,36 @@ from .models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = User
         fields = ('id', 'name', 'email', 'password')
 
+    def validate_email(self, value):
+        """Check if email already exists"""
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already registered.")
+        return value
+
+    def validate(self, data):
+        """Additional validation"""
+        if not data.get('name'):
+            raise serializers.ValidationError({'name': 'Name is required'})
+        if not data.get('password'):
+            raise serializers.ValidationError({'password': 'Password is required'})
+        return data
+
     def create(self, validated_data):
         password = validated_data.pop('password')
-        user = User.objects.create_user(password=password, **validated_data)
-        return user
+        try:
+            print(f"[REGISTER SERIALIZER] Creating user with email: {validated_data.get('email')}")
+            user = User.objects.create_user(password=password, **validated_data)
+            print(f"[REGISTER SERIALIZER] ✓ User created successfully")
+            return user
+        except Exception as e:
+            print(f"[REGISTER SERIALIZER] ✗ Error: {str(e)}")
+            raise serializers.ValidationError({'detail': str(e)})
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):

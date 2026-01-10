@@ -46,11 +46,34 @@ export default function RegisterPage() {
         return;
       }
 
+      console.log('[REGISTER] Response status:', response.status);
+      console.log('[REGISTER] Response data:', data);
+
       if (!response.ok) {
-        setError(data.message || "Registration failed. Please try again.");
+        // Better error message extraction
+        let errorMsg = 'Registration failed. Please try again.';
+        if (data.detail) {
+          errorMsg = data.detail;
+        } else if (data.message) {
+          errorMsg = data.message;
+        } else if (data.error) {
+          errorMsg = data.error;
+        } else if (typeof data === 'object') {
+          // Handle field-specific errors
+          const firstError = Object.values(data)[0];
+          if (typeof firstError === 'string') {
+            errorMsg = firstError;
+          } else if (Array.isArray(firstError) && firstError.length > 0) {
+            errorMsg = firstError[0];
+          }
+        }
+        console.error('[REGISTER] Error:', errorMsg);
+        setError(errorMsg);
         setIsLoading(false);
         return;
       }
+
+      console.log('[REGISTER] Account created successfully, attempting auto sign-in...');
 
       // Sign in the user after successful registration
       const signInResult = await signIn("credentials", {
@@ -60,7 +83,10 @@ export default function RegisterPage() {
         callbackUrl: "/dashboard",
       });
 
+      console.log('[REGISTER] Sign-in result:', signInResult);
+
       if (signInResult?.error) {
+        console.log('[REGISTER] Auto sign-in failed, redirecting to login');
         setError("Account created. Please sign in with your credentials.");
         setIsLoading(false);
         router.push("/login");
@@ -68,6 +94,7 @@ export default function RegisterPage() {
       }
 
       if (signInResult?.ok) {
+        console.log('[REGISTER] Sign-in successful, redirecting to dashboard');
         router.push("/dashboard");
       }
     } catch (error) {
