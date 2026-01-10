@@ -67,17 +67,27 @@ export default function ChatsPage() {
 
     const fetchConversations = async () => {
       try {
+        const token = (session as any)?.accessToken || (session as any)?.access_token;
+        console.log('[CHATS] Fetching with token:', !!token);
+        
         const res = await fetch('/api/messaging/conversations', {
           headers: {
-            'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token}`,
+            'Authorization': `Bearer ${token}`,
           }
         });
 
-        if (!res.ok) throw new Error('Failed to fetch conversations');
+        console.log('[CHATS] Response status:', res.status);
+        
+        if (!res.ok) {
+          const errData = await res.json();
+          console.error('[CHATS] Fetch error:', errData);
+          throw new Error(errData.error || 'Failed to fetch conversations');
+        }
+        
         const data = await res.json();
         setConversations(data.results || data);
       } catch (err: any) {
-        console.error('Error fetching conversations:', err);
+        console.error('Error fetching conversations:', err.message);
       } finally {
         setLoading(false);
       }

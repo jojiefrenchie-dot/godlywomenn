@@ -7,6 +7,12 @@ export async function GET(req: Request) {
     const apiUrl = getApiUrl('/api/messaging/conversations/', true);
     const authHeader = req.headers.get('authorization');
 
+    console.log('[MESSAGING_CONVERSATIONS_GET]', {
+      url: apiUrl,
+      hasAuth: !!authHeader,
+      authPrefix: authHeader?.substring(0, 20),
+    });
+
     const resp = await fetch(apiUrl, {
       method: 'GET',
       headers: {
@@ -17,8 +23,13 @@ export async function GET(req: Request) {
     });
 
     if (!resp.ok) {
+      const errData = await resp.text();
+      console.error('[MESSAGING_CONVERSATIONS_GET] Error:', {
+        status: resp.status,
+        data: errData,
+      });
       return NextResponse.json(
-        { error: 'Failed to fetch conversations' },
+        { error: 'Failed to fetch conversations', details: errData },
         { status: resp.status }
       );
     }
@@ -28,7 +39,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error('[MESSAGING_CONVERSATIONS]', error);
     return NextResponse.json(
-      { error: 'Server error' },
+      { error: 'Server error', details: String(error) },
       { status: 500 }
     );
   }
