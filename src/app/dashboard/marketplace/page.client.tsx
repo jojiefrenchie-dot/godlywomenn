@@ -560,8 +560,8 @@ export default function DashboardMarketplace() {
   const fetchItems = useCallback(async () => {
     setLoading(true);
     try {
-      // Fetch all items, but we'll only show the user's own items
-      const res = await fetch(`${DJANGO_API}/api/marketplace/`);
+      // Fetch all items through Next.js proxy
+      const res = await fetch(`/api/marketplace`);
       if (!res.ok) throw new Error('Failed to fetch items');
       const data = await res.json();
       // Filter to only show user's own listings
@@ -603,7 +603,7 @@ export default function DashboardMarketplace() {
           console.log('Sending JSON for update:', data);
         }
         
-        const res = await fetch(`${DJANGO_API}/api/marketplace/${editing.id}/`, {
+        const res = await fetch(`/api/marketplace/${editing.id}/`, {
           method: 'PATCH',
           headers: buildHeaders(isForm),
           body: isForm ? (data as FormData) : JSON.stringify(data),
@@ -622,7 +622,7 @@ export default function DashboardMarketplace() {
           console.log('Sending JSON for create:', data);
         }
         
-        const res = await fetch(`${DJANGO_API}/api/marketplace/`, {
+        const res = await fetch(`/api/marketplace`, {
           method: 'POST',
           headers: buildHeaders(isForm),
           body: isForm ? (data as FormData) : JSON.stringify(data),
@@ -659,7 +659,7 @@ export default function DashboardMarketplace() {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      const res = await fetch(`${DJANGO_API}/api/marketplace/${id}/`, { 
+      const res = await fetch(`/api/marketplace/${id}/`, { 
         method: 'DELETE',
         headers,
       });

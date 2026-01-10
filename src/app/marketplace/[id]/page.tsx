@@ -58,7 +58,7 @@ export default function ListingDetailPage({ params }: PageProps) {
   useEffect(() => {
     async function fetchListing() {
       try {
-        const res = await fetch(`${DJANGO_API}/api/marketplace/${resolvedParams.id}/`);
+        const res = await fetch(`/api/marketplace/${resolvedParams.id}/`);
         if (!res.ok) throw new Error('Failed to fetch listing');
         const data = await res.json();
         setListing(data);

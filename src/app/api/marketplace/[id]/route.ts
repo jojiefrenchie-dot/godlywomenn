@@ -9,6 +9,32 @@ interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
+export async function GET(req: NextRequest, context: RouteContext) {
+  try {
+    const { id } = await context.params;
+    console.log('GET /api/marketplace/[id] - ID:', id);
+
+    const resp = await fetch(`${DJANGO_API}/api/marketplace/${id}/`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!resp.ok) {
+      const json = await resp.json().catch(() => ({}));
+      console.error('Django get marketplace item error', resp.status, json);
+      return NextResponse.json({ error: 'Failed to get marketplace item', detail: json }, { status: resp.status });
+    }
+
+    const json = await resp.json();
+    return NextResponse.json(json);
+  } catch (error) {
+    console.error('Error getting marketplace item:', error);
+    return NextResponse.json({ error: 'Failed to get marketplace item', detail: String(error) }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
