@@ -28,8 +28,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     
     def validate(self, attrs):
         # SimpleJWT expects attrs with the username_field (which is 'email')
-        # Just call parent validate as is
-        return super().validate(attrs)
+        print(f"[TOKEN SERIALIZER] Attempting authentication with email: {attrs.get('email', 'NO_EMAIL')}")
+        try:
+            validated = super().validate(attrs)
+            print(f"[TOKEN SERIALIZER] Authentication successful")
+            return validated
+        except Exception as e:
+            print(f"[TOKEN SERIALIZER] Authentication failed: {str(e)}")
+            print(f"[TOKEN SERIALIZER] Fields: {list(attrs.keys())}")
+            raise
 
 
 class UserSerializer(serializers.ModelSerializer):
