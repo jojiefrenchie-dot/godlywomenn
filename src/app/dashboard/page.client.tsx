@@ -122,7 +122,7 @@ export default function DashboardPageClient() {
         }
 
         // Try to fetch activity - but don't fail if it doesn't work
-        let activityData = [];
+        let activityData: UserActivity[] = [];
         try {
           activityData = await getUserActivity(session.user.id);
           console.log('[DASHBOARD] Activity fetched successfully:', activityData?.length || 0);
