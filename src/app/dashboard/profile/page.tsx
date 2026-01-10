@@ -31,14 +31,22 @@ export default function EditProfilePage() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
-        const res = await fetch(`${djangoApi}/api/auth/me/`, {
-          credentials: "include",
+        const token = (session as any)?.accessToken || (session as any)?.access_token;
+        console.log('[PROFILE] Loading profile with token:', !!token);
+        
+        const res = await fetch('/api/auth/me', {
           headers: {
-            'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token}`,
+            'Authorization': `Bearer ${token}`,
           }
         });
-        if (!res.ok) throw new Error("Failed to fetch profile");
+        
+        console.log('[PROFILE] Profile response:', res.status);
+        
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || "Failed to fetch profile");
+        }
+        
         const user = await res.json();
         setFormData({
           name: user.name || "",
@@ -57,7 +65,7 @@ export default function EditProfilePage() {
         }
       } catch (err) {
         setError("Failed to load profile");
-        console.error(err);
+        console.error('[PROFILE] Load error:', err);
       } finally {
         setIsLoading(false);
       }
@@ -98,16 +106,19 @@ export default function EditProfilePage() {
       };
 
       // Send update request
+      const token = (session as any)?.accessToken || (session as any)?.access_token;
       const res = await fetch("/api/auth/me", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(updateData),
-        credentials: "include",
       });
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.detail || "Failed to update profile");
+        throw new Error(error.detail || error.error || "Failed to update profile");
       }
 
       setSuccess("Profile updated successfully!");
