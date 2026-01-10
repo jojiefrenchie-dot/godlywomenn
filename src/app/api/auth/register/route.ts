@@ -21,10 +21,24 @@ export async function POST(req: Request) {
       console.error('Django register error:', resp.status, json);
       // Extract error message from Django response
       let message = 'Registration failed';
-      if (json.email && Array.isArray(json.email)) {
+      
+      // Check for field-specific errors (password, email, name, etc.)
+      if (json.errors && typeof json.errors === 'object') {
+        const firstField = Object.keys(json.errors)[0];
+        const firstError = json.errors[firstField];
+        if (Array.isArray(firstError) && firstError.length > 0) {
+          message = firstError[0];
+        } else if (typeof firstError === 'string') {
+          message = firstError;
+        }
+      } else if (json.email && Array.isArray(json.email)) {
         message = json.email[0];
       } else if (json.email && typeof json.email === 'string') {
         message = json.email;
+      } else if (json.password && Array.isArray(json.password)) {
+        message = json.password[0];
+      } else if (json.password && typeof json.password === 'string') {
+        message = json.password;
       } else if (json.message) {
         message = json.message;
       } else if (json.detail) {
@@ -32,6 +46,7 @@ export async function POST(req: Request) {
       } else if (json.error) {
         message = typeof json.error === 'string' ? json.error : 'Registration failed';
       }
+      console.error('[REGISTER] Extracted error message:', message);
       return NextResponse.json({ message }, { status: resp.status });
     }
 

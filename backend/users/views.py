@@ -17,7 +17,7 @@ class RegisterView(generics.CreateAPIView):
         
         if not serializer.is_valid():
             print(f"[REGISTER] Validation errors: {serializer.errors}")
-            raise serializers.ValidationError(serializer.errors)
+            return Response({'message': 'Validation failed', 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             user = serializer.save()
