@@ -83,6 +83,7 @@ export default function DashboardPageClient() {
     async function fetchUserData() {
       if (!session?.user?.id) {
         console.log('[DASHBOARD] No user ID in session yet');
+        setLoading(false);
         return;
       }
 
@@ -90,53 +91,63 @@ export default function DashboardPageClient() {
       setError(null);
 
       try {
-        console.log('[DASHBOARD] Fetching user data for:', session.user.id);
+        console.log('[DASHBOARD] Session exists:', session.user);
+        console.log('[DASHBOARD] Fetching user articles...');
         
-        if ((session as any).error === 'RefreshAccessTokenError') {
-          console.error('[DASHBOARD] Session error detected, redirecting to login');
-          window.location.href = '/login';
-          return;
-        }
-
         const token = (session as any).accessToken;
-        if (!token) {
-          console.error('[DASHBOARD] No access token in session');
-          setError('Authentication error. Please sign in again.');
-          window.location.href = '/login';
-          return;
+        console.log('[DASHBOARD] Access token available:', !!token);
+
+        // Try to fetch articles first - this is the most important part
+        let articlesData = [];
+        try {
+          articlesData = await getUserArticles(session.user.id, token);
+          console.log('[DASHBOARD] Articles fetched successfully:', articlesData?.length || 0);
+        } catch (articleError) {
+          console.error('[DASHBOARD] Article fetch error:', articleError);
+          articlesData = [];
         }
 
-        console.log('[DASHBOARD] Access token available, fetching data...');
+        // Try to fetch stats - but don't fail if it doesn't work
+        let statsData = {
+          articlesRead: 0,
+          prayersPosted: 0,
+          daysActive: 0
+        };
+        try {
+          statsData = await getUserStats(session.user.id, token);
+          console.log('[DASHBOARD] Stats fetched successfully:', statsData);
+        } catch (statsError) {
+          console.error('[DASHBOARD] Stats fetch error (non-critical):', statsError);
+          // Use defaults
+        }
 
-        const [articlesData, statsData, activityData] = await Promise.all([
-          getUserArticles(session.user.id, token),
-          getUserStats(session.user.id, token),
-          getUserActivity(session.user.id)
-        ]);
-        
-        console.log('[DASHBOARD] Data fetched:', {
-          articles: articlesData?.length || 0,
-          stats: statsData,
-          activity: activityData?.length || 0
-        });
-        
+        // Try to fetch activity - but don't fail if it doesn't work
+        let activityData = [];
+        try {
+          activityData = await getUserActivity(session.user.id);
+          console.log('[DASHBOARD] Activity fetched successfully:', activityData?.length || 0);
+        } catch (activityError) {
+          console.error('[DASHBOARD] Activity fetch error (non-critical):', activityError);
+          // Use empty array
+        }
+
+        // Set all data regardless of what succeeded
         if (Array.isArray(articlesData)) {
           setArticles(articlesData);
         } else {
-          console.warn('[DASHBOARD] Articles data is not an array:', articlesData);
           setArticles([]);
         }
 
-        if (statsData) {
-          setStats(statsData);
-        }
+        setStats(statsData);
 
         if (Array.isArray(activityData)) {
           setRecentActivity(activityData);
         }
 
+        console.log('[DASHBOARD] All data loaded');
+
       } catch (error) {
-        console.error('[DASHBOARD] Error fetching user data:', error);
+        console.error('[DASHBOARD] Unexpected error:', error);
         const errorMsg = error instanceof Error ? error.message : 'Failed to load dashboard data';
         setError(errorMsg);
       } finally {
@@ -144,7 +155,11 @@ export default function DashboardPageClient() {
       }
     }
 
-    fetchUserData();
+    if (session) {
+      fetchUserData();
+    } else {
+      setLoading(false);
+    }
   }, [session]);
 
   if (status === "loading" || loading) {
