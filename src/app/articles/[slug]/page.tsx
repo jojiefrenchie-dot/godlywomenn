@@ -14,9 +14,10 @@ const DJANGO_API = 'http://127.0.0.1:8000';
 function buildAbsoluteUrl(base: string, path: string) {
   if (!path) return '';
   if (/^https?:\/\//i.test(path)) return path;
+  // For media files, use Next.js proxy endpoint
   if (path.startsWith('/media/')) {
-    const b = String(base || '').replace(/\/$/, '');
-    return b + path;
+    const mediaPath = path.replace(/^\/media\//, '');
+    return `/api/media/${mediaPath}`;
   }
   const b = String(base || '').replace(/\/$/, '');
   const p = path.startsWith('/') ? path : '/' + path;

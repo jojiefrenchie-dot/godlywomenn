@@ -10,13 +10,27 @@ import { useLike } from '@/app/providers/LikeContext';
 
 const DJANGO_API = process.env.NEXT_PUBLIC_DJANGO_API || 'http://127.0.0.1:8000';
 
+/**
+ * Build absolute URL for media files
+ * 
+ * For /media/* paths, uses the Next.js proxy endpoint for better compatibility
+ * For other paths, builds full URL using Django API base
+ */
 function buildAbsoluteUrl(base: string, path: string) {
   if (!path) return '';
+  
+  // If already a full URL, return as-is
   if (/^https?:\/\//i.test(path)) return path;
+  
+  // For media files, use Next.js proxy endpoint
+  // This ensures images work even if Django doesn't serve media directly
   if (path.startsWith('/media/')) {
-    const b = String(base || '').replace(/\/$/, '');
-    return b + path;
+    // Remove leading slash and use Next.js proxy
+    const mediaPath = path.replace(/^\/media\//, '');
+    return `/api/media/${mediaPath}`;
   }
+  
+  // For other paths, build full URL with Django API
   const b = String(base || '').replace(/\/$/, '');
   const p = path.startsWith('/') ? path : '/' + path;
   return b + p;

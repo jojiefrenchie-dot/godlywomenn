@@ -12,10 +12,10 @@ import Link from 'next/link';
     if (!path) return '';
     // If already absolute HTTP(S), return as-is
     if (/^https?:\/\//i.test(path)) return path;
-    // If starts with /media/, prepend Django API
+    // If starts with /media/, use Next.js proxy endpoint for compatibility
     if (path.startsWith('/media/')) {
-      const b = String(base || '').replace(/\/$/, '');
-      return b + path;
+      const mediaPath = path.replace(/^\/media\//, '');
+      return `/api/media/${mediaPath}`;
     }
     const b = String(base || '').replace(/\/$/, '');
     const p = path.startsWith('/') ? path : '/' + path;
