@@ -10,13 +10,13 @@ export async function PATCH(
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return new Response("Unauthorized", { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
   const { status } = await request.json();
   const params = await context.params as { id: string };
     if (!status || !['draft', 'published'].includes(status)) {
-      return new Response("Invalid status", { status: 400 });
+      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 
     // Get access token from session
@@ -29,7 +29,7 @@ export async function PATCH(
       accessToken = (refreshedSession as any)?.accessToken;
       
       if (!accessToken) {
-        return new Response("Failed to refresh access token", { status: 401 });
+        return NextResponse.json({ error: "Failed to refresh access token" }, { status: 401 });
       }
     }
 
@@ -50,7 +50,7 @@ export async function PATCH(
       const newAccessToken = (refreshedSession as any)?.accessToken;
       
       if (!newAccessToken) {
-        return new Response("Failed to refresh access token", { status: 401 });
+        return NextResponse.json({ error: "Failed to refresh access token" }, { status: 401 });
       }
 
       // Retry with new token
@@ -64,24 +64,24 @@ export async function PATCH(
       });
 
       if (!retryResponse.ok) {
-        const error = await retryResponse.text();
-        return new Response(error, { status: retryResponse.status });
+        const error = await retryResponse.json().catch(() => ({ error: "Failed to update article status" }));
+        return NextResponse.json(error, { status: retryResponse.status });
       }
 
       const data = await retryResponse.json();
-      return Response.json(data);
+      return NextResponse.json(data);
     }
 
     // Handle other errors
     if (!response.ok) {
-      const error = await response.text();
-      return new Response(error, { status: response.status });
+      const error = await response.json().catch(() => ({ error: "Failed to update article status" }));
+      return NextResponse.json(error, { status: response.status });
     }
 
     const data = await response.json();
-    return Response.json(data);
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error updating article status:', error);
-    return new Response("Internal Server Error", { status: 500 });
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
