@@ -419,17 +419,17 @@ export default function CreateArticleClient() {
               type="button"
               onClick={(e) => handleSubmit(e, false)}
               disabled={isSubmitting}
-              className="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:opacity-50"
+              className="px-4 py-2 bg-gray-400 text-white rounded-md hover:bg-gray-500 disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : "Save as Draft"}
             </button>
             <button
-              type="button"
-              onClick={(e) => handleSubmit(e, true)}
+              type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-[#dc143c] text-white rounded-md hover:bg-[#b01031] disabled:opacity-50"
+              onClick={(e) => handleSubmit(e, true)}
+              className="px-4 py-2 bg-[#dc143c] text-white rounded-md hover:bg-[#b01031] disabled:opacity-50 font-semibold"
             >
-              {isSubmitting ? "Publishing..." : "Publish Now"}
+              {isSubmitting ? "Publishing..." : "Publish Article"}
             </button>
           </div>
         </div>

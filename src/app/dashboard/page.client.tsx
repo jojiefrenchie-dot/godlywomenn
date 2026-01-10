@@ -76,24 +76,37 @@ export default function DashboardPageClient() {
     daysActive: 0
   });
   const [recentActivity, setRecentActivity] = useState<UserActivity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchUserData() {
-      if (!session?.user?.id) return;
+      if (!session?.user?.id) {
+        console.log('[DASHBOARD] No user ID in session yet');
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
 
       try {
+        console.log('[DASHBOARD] Fetching user data for:', session.user.id);
+        
         if ((session as any).error === 'RefreshAccessTokenError') {
-          console.error('Session error detected, redirecting to login');
+          console.error('[DASHBOARD] Session error detected, redirecting to login');
           window.location.href = '/login';
           return;
         }
 
         const token = (session as any).accessToken;
         if (!token) {
-          console.error('No access token in session');
+          console.error('[DASHBOARD] No access token in session');
+          setError('Authentication error. Please sign in again.');
           window.location.href = '/login';
           return;
         }
+
+        console.log('[DASHBOARD] Access token available, fetching data...');
 
         const [articlesData, statsData, activityData] = await Promise.all([
           getUserArticles(session.user.id, token),
@@ -101,8 +114,17 @@ export default function DashboardPageClient() {
           getUserActivity(session.user.id)
         ]);
         
+        console.log('[DASHBOARD] Data fetched:', {
+          articles: articlesData?.length || 0,
+          stats: statsData,
+          activity: activityData?.length || 0
+        });
+        
         if (Array.isArray(articlesData)) {
           setArticles(articlesData);
+        } else {
+          console.warn('[DASHBOARD] Articles data is not an array:', articlesData);
+          setArticles([]);
         }
 
         if (statsData) {
@@ -114,17 +136,18 @@ export default function DashboardPageClient() {
         }
 
       } catch (error) {
-        console.error('Error fetching user data:', error);
-        if (error instanceof Error && error.message.includes('401')) {
-          window.location.href = '/login';
-        }
+        console.error('[DASHBOARD] Error fetching user data:', error);
+        const errorMsg = error instanceof Error ? error.message : 'Failed to load dashboard data';
+        setError(errorMsg);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchUserData();
   }, [session]);
 
-  if (status === "loading") {
+  if (status === "loading" || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#dc143c]"></div>
@@ -137,6 +160,17 @@ export default function DashboardPageClient() {
   return (
     <div suppressHydrationWarning className="min-h-screen bg-gradient-to-b from-white to-[#fdebd0]/20 pt-20">
       <div suppressHydrationWarning className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700 font-medium">Error Loading Dashboard</p>
+            <p className="text-red-600 text-sm mt-1">{error}</p>
+            <p className="text-red-600 text-xs mt-2">
+              Please check the browser console for more details. If the problem persists, try signing in again.
+            </p>
+          </div>
+        )}
+
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-serif text-gray-900 mb-2">

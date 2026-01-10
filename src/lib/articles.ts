@@ -101,10 +101,8 @@ export async function getArticles(filters: ArticleFilters = {}) {
   if (filters.includeAll) params.set('includeAll', '1');
   if (authorId) params.set('author', authorId);
   
-  // Set default status filter to published, but show all if includeAll is true
-  if (!filters.includeAll) {
-    params.set('status', 'published');
-  }
+  // Note: Status filtering is handled server-side based on includeAll and authentication
+  console.log('[getArticles] Fetching with params:', params.toString(), { includeAll: filters.includeAll, authorId });
 
   // Get session token for authenticated requests
   let accessToken: string | null = null;
@@ -115,11 +113,14 @@ export async function getArticles(filters: ArticleFilters = {}) {
       accessToken = sessionJson?.accessToken ?? null;
     }
   } catch (e) {
-    console.error('Failed to get session:', e);
+    console.error('[getArticles] Failed to get session:', e);
   }
 
   try {
-    const res = await fetchWithAuth(getDjangoApiUrl(`/api/articles/?${params.toString()}`), {
+    const fetchUrl = getDjangoApiUrl(`/api/articles/?${params.toString()}`);
+    console.log('[getArticles] Fetch URL:', fetchUrl);
+    
+    const res = await fetchWithAuth(fetchUrl, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -130,16 +131,17 @@ export async function getArticles(filters: ArticleFilters = {}) {
     });
 
     if (!res.ok) {
-      console.error('Failed to fetch articles from Django', res.status);
+      console.error('[getArticles] Failed to fetch articles from Django', res.status, res.statusText);
       throw new Error('Failed to fetch articles');
     }
 
-    console.log('Articles response:', res.status);
+    console.log('[getArticles] Response status:', res.status);
     const data = await res.json();
-    console.log('Articles data:', data);
+    console.log('[getArticles] Response data:', data);
 
     // Handle both array responses and paginated responses
     if (Array.isArray(data)) {
+      console.log('[getArticles] Got array response with', data.length, 'articles');
       return {
         articles: data,
         total: data.length,
@@ -151,6 +153,7 @@ export async function getArticles(filters: ArticleFilters = {}) {
 
     // Handle paginated response
     if (data.results) {
+      console.log('[getArticles] Got paginated response with', data.results.length, 'articles');
       return {
         articles: data.results,
         total: data.count || data.results.length,
@@ -161,6 +164,7 @@ export async function getArticles(filters: ArticleFilters = {}) {
     }
 
     // Fallback for other response formats
+    console.log('[getArticles] Got unknown response format:', data);
     return {
       articles: data.articles || [],
       total: data.total || 0,
@@ -169,7 +173,7 @@ export async function getArticles(filters: ArticleFilters = {}) {
       totalPages: data.totalPages || 0,
     };
   } catch (error) {
-    console.error('Error fetching articles:', error);
+    console.error('[getArticles] Error fetching articles:', error);
     // Return empty articles list on error instead of throwing
     return {
       articles: [],
