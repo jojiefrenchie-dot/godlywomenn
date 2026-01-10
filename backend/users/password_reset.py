@@ -27,7 +27,9 @@ def forgot_password(request):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     
     # Return reset link (frontend can use this)
-    reset_url = f"http://localhost:3000/reset-password?uid={uid}&token={token}"
+    # Use production URL in production, localhost in development
+    frontend_url = "https://godlywomenn.vercel.app" if "onrender.com" in request.build_absolute_uri() else "http://localhost:3000"
+    reset_url = f"{frontend_url}/reset-password?uid={uid}&token={token}"
     
     return Response({'resetUrl': reset_url, 'message': 'Reset link generated'}, status=status.HTTP_200_OK)
 
