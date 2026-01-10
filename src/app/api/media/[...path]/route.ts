@@ -57,7 +57,31 @@ export async function GET(
       console.error('[MEDIA PROXY] Error status:', response.status, response.statusText);
       console.error('[MEDIA PROXY] Content-Type:', response.headers.get('Content-Type'));
       
-      // Return 404 with helpful error message
+      // For 404, return a placeholder SVG image instead of JSON error
+      if (response.status === 404) {
+        const placeholderSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+          <rect width="400" height="300" fill="#f3f4f6"/>
+          <g opacity="0.5">
+            <circle cx="100" cy="80" r="30" fill="#e5e7eb"/>
+            <path d="M 50 200 L 150 100 L 250 150 L 400 50 L 400 300 L 0 300 Z" fill="#e5e7eb"/>
+            <rect x="200" y="130" width="80" height="80" rx="5" fill="#e5e7eb"/>
+          </g>
+          <text x="200" y="280" text-anchor="middle" font-family="system-ui" font-size="14" fill="#9ca3af">
+            Image not available
+          </text>
+        </svg>`;
+        
+        return new Response(placeholderSvg, {
+          status: 200,
+          headers: {
+            'Content-Type': 'image/svg+xml',
+            'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+            'Access-Control-Allow-Origin': '*',
+          },
+        });
+      }
+
+      // Return JSON error for other errors
       return NextResponse.json(
         { 
           error: 'Image not found on backend',
