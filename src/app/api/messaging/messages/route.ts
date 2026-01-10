@@ -35,23 +35,46 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
     const apiUrl = getApiUrl('/api/messaging/messages/', true);
     const authHeader = req.headers.get('authorization');
+    const contentType = req.headers.get('content-type') || '';
+
+    console.log('[MESSAGING_MESSAGES_POST]', {
+      url: apiUrl,
+      contentType,
+      hasAuth: !!authHeader,
+    });
+
+    let body: any;
+    
+    // Handle both FormData and JSON
+    if (contentType.includes('application/json')) {
+      body = await req.json();
+    } else if (contentType.includes('multipart/form-data')) {
+      // For FormData, pass it through directly
+      body = await req.formData();
+    } else {
+      body = await req.json();
+    }
 
     const resp = await fetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
         ...(authHeader ? { 'Authorization': authHeader } : {}),
+        // Don't set Content-Type for FormData - let fetch set it with boundary
+        ...(!(body instanceof FormData) ? { 'Content-Type': 'application/json' } : {}),
       },
-      body: JSON.stringify(body),
+      body: body instanceof FormData ? body : JSON.stringify(body),
     });
 
     if (!resp.ok) {
+      const errData = await resp.text();
+      console.error('[MESSAGING_MESSAGES_POST] Error:', {
+        status: resp.status,
+        data: errData,
+      });
       return NextResponse.json(
-        { error: 'Failed to send message' },
+        { error: 'Failed to send message', details: errData },
         { status: resp.status }
       );
     }
@@ -61,7 +84,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('[MESSAGING_MESSAGES_POST]', error);
     return NextResponse.json(
-      { error: 'Server error' },
+      { error: 'Server error', details: String(error) },
       { status: 500 }
     );
   }
