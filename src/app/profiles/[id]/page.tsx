@@ -64,10 +64,8 @@ export default function UserProfilePage({
 
     const fetchProfile = async () => {
       try {
-        const djangoApi = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
-        
-        // Fetch user data - no auth required for public profile
-        const userRes = await fetch(`${djangoApi}/api/auth/${userId}/`, {
+        // Fetch user data - use proxy for CORS compatibility
+        const userRes = await fetch(`/api/auth/${userId}`, {
           headers: {
             'Content-Type': 'application/json',
           }
@@ -94,7 +92,7 @@ export default function UserProfilePage({
         });
 
         // Fetch stats - requires authentication
-        const statsRes = await fetch(`${djangoApi}/api/auth/${userId}/stats/`, {
+        const statsRes = await fetch(`/api/auth/${userId}/stats`, {
           headers: {
             'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token || ''}`,
           }
@@ -144,7 +142,7 @@ export default function UserProfilePage({
         <div className="flex flex-col sm:flex-row gap-6 mb-8">
           {profile.image ? (
             <Image
-              src={buildAbsoluteUrl(DJANGO_API, profile.image)}
+              src={profile.image.startsWith('/') ? `/api${profile.image}` : `/api/media/${profile.image}`}
               alt={profile.name}
               width={120}
               height={120}

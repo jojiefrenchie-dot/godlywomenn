@@ -92,6 +92,30 @@ export default function EditProfilePage() {
 
     try {
       setIsSubmitting(true);
+      const token = (session as any)?.accessToken || (session as any)?.access_token;
+
+      // Upload image if one was selected
+      if (formData.avatar) {
+        console.log('[PROFILE] Uploading image...');
+        const imageFormData = new FormData();
+        imageFormData.append('image', formData.avatar);
+
+        const imageRes = await fetch("/api/auth/upload-image", {
+          method: "POST",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: imageFormData,
+        });
+
+        if (!imageRes.ok) {
+          const error = await imageRes.json();
+          throw new Error(error.error || "Failed to upload image");
+        }
+
+        const imageData = await imageRes.json();
+        console.log('[PROFILE] Image uploaded successfully:', imageData);
+      }
 
       // Prepare form data
       const updateData: Record<string, any> = {
@@ -106,7 +130,6 @@ export default function EditProfilePage() {
       };
 
       // Send update request
-      const token = (session as any)?.accessToken || (session as any)?.access_token;
       const res = await fetch("/api/auth/me", {
         method: "PATCH",
         headers: {
