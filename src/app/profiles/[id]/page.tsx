@@ -65,7 +65,7 @@ export default function UserProfilePage({
     const fetchProfile = async () => {
       try {
         // Fetch user data - use proxy for CORS compatibility
-        const userRes = await fetch(`/api/auth/${userId}`, {
+        const userRes = await fetch(`/api/user/${userId}`, {
           headers: {
             'Content-Type': 'application/json',
           }
@@ -92,7 +92,7 @@ export default function UserProfilePage({
         });
 
         // Fetch stats - requires authentication
-        const statsRes = await fetch(`/api/auth/${userId}/stats`, {
+        const statsRes = await fetch(`/api/user/${userId}/stats`, {
           headers: {
             'Authorization': `Bearer ${(session as any)?.accessToken || (session as any)?.access_token || ''}`,
           }
