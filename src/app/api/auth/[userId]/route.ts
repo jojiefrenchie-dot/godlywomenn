@@ -32,6 +32,9 @@ export async function GET(
       );
     }
 
+    const apiUrl = getApiUrl(`/api/auth/${userId}/`, true);
+
+    console.log('[USER_DETAIL]', {
       url: apiUrl,
       userId,
     });
