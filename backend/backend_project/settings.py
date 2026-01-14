@@ -59,13 +59,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend_project.wsgi.application'
 
-# Database - use PostgreSQL on Render
+# Database - use PostgreSQL on Render, SQLite locally
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
         conn_max_age=600
     )
 }
+
+# Ensure SQLite database directory exists
+if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+    db_path = DATABASES['default']['NAME']
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    print(f"[DB] Using SQLite at: {db_path}")
 
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -124,14 +130,29 @@ CORS_ALLOWED_ORIGINS = config(
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
 
+# Session Configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 86400 * 7  # 7 days
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# For local development, allow non-secure cookies over HTTP
+if DEBUG:
+    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SECURE = False
+else:
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
+    CSRF_COOKIE_SECURE = True
+
 # Use custom user model
 AUTH_USER_MODEL = 'users.User'
 
 # Security Settings for Production
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_SECURITY_POLICY = {
         "default-src": ("'self'",),
