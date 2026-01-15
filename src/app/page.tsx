@@ -117,7 +117,7 @@ export default function Home() {
           <div suppressHydrationWarning className="mb-8">
             <Image src="/logo.png" alt="GodlyWomen Logo" width={120} height={120} className="mx-auto mb-8" />
           </div>
-          <h1 className="text-[4rem] sm:text-[5rem] leading-none tracking-tight mb-6 font-serif text-[#dc143c]">
+          <h1 className="text-[4rem] sm:text-[5rem] leading-none tracking-tight mb-6 font-serif text-black">
             Godly Women in<br />the Marketplace
           </h1>
           <p className="text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto mb-12">
