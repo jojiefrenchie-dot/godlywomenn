@@ -7,8 +7,9 @@ from . import views_stats
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('me/', MeView.as_view(), name='me'),
-    path('upload-image/', upload_profile_image, name='upload_profile_image'),
+    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('upload-image/', upload_profile_image, name='upload_profile_image'),
     path('forgot-password/', forgot_password, name='forgot_password'),
     path('reset-password/', reset_password, name='reset_password'),
     path('<str:user_id>/', UserDetailView.as_view(), name='user-detail'),
