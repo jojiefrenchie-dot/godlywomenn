@@ -64,11 +64,18 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          console.log('[AUTHORIZE] Attempting to authenticate:', credentials.email);
+          console.log('[AUTHORIZE] Credentials received:', { 
+            email: credentials.email, 
+            password: '***',
+            keys: Object.keys(credentials)
+          });
           
           // Call Django token endpoint to get JWT
           const tokenUrl = getApiUrl('/api/auth/token/', true); // true = server-side
           console.log('[AUTHORIZE] Token URL:', tokenUrl);
+          
+          const requestBody = { email: credentials.email, password: credentials.password };
+          console.log('[AUTHORIZE] Request body:', requestBody);
           
           const tokenRes = await fetch(tokenUrl, {
             method: 'POST',
@@ -76,14 +83,20 @@ export const authOptions: NextAuthOptions = {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
             },
-            body: JSON.stringify({ email: credentials.email, password: credentials.password }),
+            body: JSON.stringify(requestBody),
           });
 
           if (!tokenRes.ok) {
             console.error('[AUTHORIZE] Django token endpoint returned', tokenRes.status);
-            const errorData = await tokenRes.json().catch(() => ({}));
-            console.error('[AUTHORIZE] Error data:', errorData);
-            throw new Error(errorData.detail || errorData.message || "Invalid credentials");
+            const errorText = await tokenRes.text();
+            console.error('[AUTHORIZE] Response text:', errorText);
+            try {
+              const errorData = JSON.parse(errorText);
+              console.error('[AUTHORIZE] Error data:', errorData);
+              throw new Error(errorData.detail || errorData.message || errorData.non_field_errors?.[0] || "Invalid credentials");
+            } catch (e) {
+              throw new Error("Invalid credentials");
+            }
           }
 
           const tokenData = await tokenRes.json();
