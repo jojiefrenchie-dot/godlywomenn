@@ -75,6 +75,10 @@ export default function RegisterPage() {
 
       console.log('[REGISTER] Account created successfully, attempting auto sign-in...');
 
+      // Wait a bit for the database to fully commit before attempting sign-in
+      // This prevents "Invalid credentials" errors due to race conditions
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       // Sign in the user after successful registration
       const signInResult = await signIn("credentials", {
         email,
@@ -86,10 +90,11 @@ export default function RegisterPage() {
       console.log('[REGISTER] Sign-in result:', signInResult);
 
       if (signInResult?.error) {
-        console.log('[REGISTER] Auto sign-in failed, redirecting to login');
-        setError("Account created. Please sign in with your credentials.");
+        console.log('[REGISTER] Auto sign-in failed:', signInResult.error, 'redirecting to login');
+        setError("Account created successfully! Please sign in with your credentials.");
         setIsLoading(false);
-        router.push("/login");
+        // Give user 2 seconds to read the message, then redirect
+        setTimeout(() => router.push("/login"), 2000);
         return;
       }
 
