@@ -117,23 +117,23 @@ export default function Home() {
           <div suppressHydrationWarning className="mb-8">
             <Image src="/logo.png" alt="GodlyWomen Logo" width={120} height={120} className="mx-auto mb-8" />
           </div>
-          <h1 className="text-[4rem] sm:text-[5rem] leading-none tracking-tight mb-6 font-serif text-gray-900">
-            Godly Women in<br />Business
+          <h1 className="text-[4rem] sm:text-[5rem] leading-none tracking-tight mb-6 font-serif text-[#dc143c]">
+            Godly Women in<br />the Marketplace
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto mb-12">
-            A place to discover and celebrate faithful women through history
+          <p className="text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto mb-12">
+            Daniel 11:32 &quot;but the people who know their God shall be strong, and carry out great exploits&quot;
           </p>
           {!session?.user && (
-            <div className="flex gap-4 justify-center">
+            <div className="flex gap-4 justify-center z-10 relative">
               <Link 
                 href="/register"
-                className="inline-flex h-12 items-center px-8 justify-center rounded-lg bg-[#dc143c] text-white text-lg font-medium transition-all hover:bg-[#f75270]"
+                className="inline-flex h-12 items-center px-8 justify-center rounded-lg bg-[#dc143c] text-white text-lg font-medium transition-all hover:bg-[#f75270] cursor-pointer"
               >
                 Get Started
               </Link>
               <Link 
                 href="/login"
-                className="inline-flex h-12 items-center px-8 justify-center rounded-lg border-2 border-[#dc143c] text-[#dc143c] text-lg font-medium transition-all hover:bg-[#fdebd0]"
+                className="inline-flex h-12 items-center px-8 justify-center rounded-lg border-2 border-[#dc143c] text-[#dc143c] text-lg font-medium transition-all hover:bg-[#fdebd0] cursor-pointer"
               >
                 Sign In
               </Link>
