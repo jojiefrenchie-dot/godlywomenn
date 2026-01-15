@@ -33,10 +33,19 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 # Allowed hosts - configure in environment
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 if not ALLOWED_HOSTS or ALLOWED_HOSTS == ['']:
-    raise ValueError(
-        "ALLOWED_HOSTS environment variable is not set. "
-        "Set it to a comma-separated list of allowed domains."
-    )
+    # Default to common hosts if not specified
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        'godlywomenn.onrender.com',
+        '*.onrender.com',
+        'godlywomenn.vercel.app',
+        '*.vercel.app',
+        'testserver',  # For testing
+    ]
+else:
+    # Clean up whitespace from env var
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS]
 
 INSTALLED_APPS = [
     'django.contrib.admin',

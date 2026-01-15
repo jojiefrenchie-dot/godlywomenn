@@ -9,7 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-in-production')
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,godlywomenn.onrender.com,*.onrender.com').split(',')
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS', 
+    default='localhost,127.0.0.1,godlywomenn.onrender.com,*.onrender.com,godlywomenn.vercel.app,*.vercel.app,testserver'
+).split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -62,7 +65,7 @@ WSGI_APPLICATION = 'backend_project.wsgi.application'
 # Database - use PostgreSQL on Render, SQLite locally
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',
+        default=f'sqlite:///{BASE_DIR}/db.sqlite3',
         conn_max_age=600
     )
 }
@@ -70,8 +73,11 @@ DATABASES = {
 # Ensure SQLite database directory exists
 if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
     db_path = DATABASES['default']['NAME']
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    print(f"[DB] Using SQLite at: {db_path}")
+    if db_path and db_path != ':memory:':
+        db_dir = os.path.dirname(db_path)
+        if db_dir:
+            os.makedirs(db_dir, exist_ok=True)
+        print(f"[DB] Using SQLite at: {db_path}")
 
 AUTH_PASSWORD_VALIDATORS = []
 
