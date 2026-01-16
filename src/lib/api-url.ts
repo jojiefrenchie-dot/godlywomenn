@@ -9,22 +9,29 @@ export function getBackendUrl(isServerSide = false) {
   const backendUrl = process.env.DJANGO_API_URL || process.env.NEXT_PUBLIC_DJANGO_API;
   
   if (backendUrl) {
+    console.log('[API_URL] Using configured backend URL:', backendUrl);
     return backendUrl;
   }
   
   // Fallback for development
   if (process.env.NODE_ENV === 'development') {
+    console.log('[API_URL] Using development fallback: http://localhost:8000');
     return 'http://localhost:8000';
   }
   
-  // For client-side API routes in production: return empty (use relative paths)
-  if (!isServerSide) {
-    return '';
+  // Production fallback - try to infer from window location
+  if (!isServerSide && typeof window !== 'undefined') {
+    // In production on Vercel, try to use the same domain or a known backend
+    const inferredUrl = window.location.hostname.includes('vercel.app')
+      ? 'https://godlywomenn.onrender.com' // Default to known Render backend
+      : 'http://localhost:8000';
+    console.warn('[API_URL] No DJANGO_API_URL configured, using fallback:', inferredUrl);
+    return inferredUrl;
   }
   
-  // No backend URL available - this will cause errors
-  console.warn('No DJANGO_API_URL or NEXT_PUBLIC_DJANGO_API configured');
-  return '';
+  // For server-side in production without URL - use known production URL
+  console.warn('[API_URL] No DJANGO_API_URL configured for server-side, using Render backend');
+  return 'https://godlywomenn.onrender.com';
 }
 
 /**
@@ -35,5 +42,7 @@ export function getBackendUrl(isServerSide = false) {
  */
 export function getApiUrl(path: string, isServerSide = false) {
   const baseUrl = getBackendUrl(isServerSide);
-  return baseUrl ? `${baseUrl}${path}` : path;
+  const fullUrl = baseUrl ? `${baseUrl}${path}` : path;
+  console.log('[API_URL] Building URL for:', path, '→', fullUrl);
+  return fullUrl;
 }

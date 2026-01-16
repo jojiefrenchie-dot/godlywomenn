@@ -60,22 +60,18 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.error('[AUTHORIZE] ✗ Missing credentials');
           throw new Error("Email and password are required");
         }
 
         try {
-          console.log('[AUTHORIZE] Credentials received:', { 
-            email: credentials.email, 
-            password: '***',
-            keys: Object.keys(credentials)
-          });
+          console.log('[AUTHORIZE] Attempting login for:', credentials.email);
           
           // Call Django token endpoint to get JWT
           const tokenUrl = getApiUrl('/api/auth/token/', true); // true = server-side
           console.log('[AUTHORIZE] Token URL:', tokenUrl);
           
           const requestBody = { email: credentials.email, password: credentials.password };
-          console.log('[AUTHORIZE] Request body:', requestBody);
           
           const tokenRes = await fetch(tokenUrl, {
             method: 'POST',
@@ -87,14 +83,18 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!tokenRes.ok) {
-            console.error('[AUTHORIZE] Django token endpoint returned', tokenRes.status);
+            const statusText = tokenRes.statusText || 'Unknown error';
+            console.error('[AUTHORIZE] ✗ Django token endpoint returned', tokenRes.status, statusText);
             const errorText = await tokenRes.text();
-            console.error('[AUTHORIZE] Response text:', errorText);
+            console.error('[AUTHORIZE] Response:', errorText);
             try {
               const errorData = JSON.parse(errorText);
-              console.error('[AUTHORIZE] Error data:', errorData);
-              throw new Error(errorData.detail || errorData.message || errorData.non_field_errors?.[0] || "Invalid credentials");
+              const errorMsg = errorData.detail || errorData.message || errorData.non_field_errors?.[0] || "Invalid credentials";
+              throw new Error(errorMsg);
             } catch (e) {
+              if (e instanceof Error && e.message !== 'Invalid credentials') {
+                console.error('[AUTHORIZE] Parse error:', e.message);
+              }
               throw new Error("Invalid credentials");
             }
           }
@@ -102,11 +102,11 @@ export const authOptions: NextAuthOptions = {
           const tokenData = await tokenRes.json();
           const { access, refresh } = tokenData;
           if (!access || !refresh) {
-            console.error('[AUTHORIZE] No tokens in response:', tokenData);
-            throw new Error("No tokens in response");
+            console.error('[AUTHORIZE] ✗ No tokens in response');
+            throw new Error("Authentication failed - no tokens received");
           }
 
-          console.log('[AUTHORIZE] Got tokens from Django');
+          console.log('[AUTHORIZE] ✓ Got tokens from Django');
 
           // Fetch user info from Django
           const userUrl = getApiUrl('/api/auth/me/', true); // true = server-side
@@ -121,12 +121,14 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!userRes.ok) {
-            console.error('[AUTHORIZE] Failed to fetch user from Django me endpoint', userRes.status);
-            throw new Error("Failed to load user info");
+            console.error('[AUTHORIZE] ✗ Failed to fetch user info, status:', userRes.status);
+            const errorText = await userRes.text();
+            console.error('[AUTHORIZE] User endpoint response:', errorText);
+            throw new Error("Failed to load user information");
           }
 
           const user = await userRes.json();
-          console.log('[AUTHORIZE] Got user info:', user.email);
+          console.log('[AUTHORIZE] ✓ Got user info:', user.email);
 
           // Return user with tokens
           return {
@@ -138,7 +140,7 @@ export const authOptions: NextAuthOptions = {
             refreshToken: refresh,
           };
         } catch (err) {
-          console.error('[AUTHORIZE] Error:', err);
+          console.error('[AUTHORIZE] ✗ Error:', err instanceof Error ? err.message : String(err));
           throw new Error(err instanceof Error ? err.message : "Authentication failed");
         }
       },
@@ -175,7 +177,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, account }) {
       // If initial sign in
       if (user) {
-        console.log('[JWT CALLBACK] New sign-in, user:', user.email);
+        console.log('[JWT CALLBACK] ✓ New sign-in, user:', user.email);
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
@@ -186,13 +188,19 @@ export const authOptions: NextAuthOptions = {
           token.accessTokenExpires = Date.now() + 900 * 1000; // 15 minutes from now
           token.refreshToken = (user as any).refreshToken;
           token.error = undefined;
-          console.log('[JWT CALLBACK] Tokens set, expires in 15 minutes');
+          console.log('[JWT CALLBACK] ✓ Tokens set, expires in 15 minutes at:', new Date(token.accessTokenExpires as number).toISOString());
         }
       }
 
-      // If the access token has expired, attempt to refresh
-      if (!token.accessTokenExpires || Date.now() >= (token.accessTokenExpires as number)) {
-        console.log('[JWT Callback] Token expired, attempting refresh, email:', token.email);
+      // Check if token needs refresh
+      const now = Date.now();
+      const expiresAt = token.accessTokenExpires as number;
+      const timeUntilExpiry = expiresAt - now;
+      
+      // If the access token has expired or will expire soon, attempt to refresh
+      // Refresh if expired OR if less than 1 minute until expiry
+      if (!expiresAt || timeUntilExpiry < 60000) {
+        console.log('[JWT CALLBACK] Token refresh needed for:', token.email, '(expires in', Math.round(timeUntilExpiry / 1000), 'seconds)');
         return refreshAccessToken(token);
       }
 
