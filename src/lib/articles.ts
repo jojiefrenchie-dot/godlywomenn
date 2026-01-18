@@ -304,7 +304,7 @@ export async function createArticle(data: {
     formData.append('content', data.content || '');
     formData.append('excerpt', data.excerpt || '');
     formData.append('category_id', data.category_id);
-    formData.append('status', 'draft');
+    formData.append('status', 'published');
     
     if (data.featured_image) {
       formData.append('featured_image', data.featured_image);
