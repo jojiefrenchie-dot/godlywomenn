@@ -46,7 +46,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     category_id = serializers.UUIDField(write_only=True)
     # Accept featured_image as either a file or a URL path string
-    featured_image = serializers.SerializerMethodField(read_only=True)
+    featured_image = serializers.ImageField(required=False, allow_null=True)
     featured_image_url = serializers.CharField(write_only=True, required=False, allow_blank=True)
     likes_count = serializers.SerializerMethodField(read_only=True)
     user_liked = serializers.SerializerMethodField(read_only=True)
@@ -57,7 +57,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'slug', 'content', 'excerpt', 'featured_image', 'featured_image_url', 'author', 
                  'category', 'category_id', 'status', 'view_count', 'created_at', 'updated_at', 'published_at', 
                  'likes_count', 'user_liked', 'comments')
-        read_only_fields = ('id', 'view_count', 'created_at', 'updated_at', 'published_at', 'slug', 'author', 'featured_image', 
+        read_only_fields = ('id', 'view_count', 'created_at', 'updated_at', 'published_at', 'slug', 'author', 
                            'likes_count', 'user_liked', 'comments')
 
     def create(self, validated_data):
@@ -100,9 +100,14 @@ class ArticleSerializer(serializers.ModelSerializer):
             'category_id': validated_data.get('category_id'),
             'status': validated_data.get('status'),
             'featured_image_url': featured_image_url,
+            'has_featured_image_file': 'featured_image' in validated_data and validated_data.get('featured_image') is not None,
         })
 
         article = super().create(validated_data)
+        
+        # Log successful image upload
+        if 'featured_image' in validated_data and validated_data.get('featured_image'):
+            print(f"✓ Article created with featured_image file: {article.featured_image}")
         
         # If featured_image_url was provided, set it on the article
         if featured_image_url:
