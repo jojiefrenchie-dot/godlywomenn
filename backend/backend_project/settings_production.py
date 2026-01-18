@@ -183,7 +183,8 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration - restrict to specific origins
-CORS_ALLOWED_ORIGINS_SETTING = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,https://godlywomenn.vercel.app,https://godlywomenn.onrender.com')
+# Includes both production and preview Vercel domains
+CORS_ALLOWED_ORIGINS_SETTING = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,https://godlywomenn.vercel.app,https://godlywomenn-jwsu32jqp-jojiefrenchie-dots-projects.vercel.app,https://godlywomenn.onrender.com')
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS_SETTING.split(',')]
 CORS_ALLOW_CREDENTIALS = True
 

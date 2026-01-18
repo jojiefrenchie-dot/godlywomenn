@@ -130,10 +130,10 @@ SIMPLE_JWT = {
     'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
 }
 
-# CORS
+# CORS - Allow both production and preview Vercel domains
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='http://localhost:3000,http://127.0.0.1:3000,https://godlywomenn.vercel.app'
+    default='http://localhost:3000,http://127.0.0.1:3000,https://godlywomenn.vercel.app,https://godlywomenn-jwsu32jqp-jojiefrenchie-dots-projects.vercel.app'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
 
