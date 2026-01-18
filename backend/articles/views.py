@@ -2,7 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.utils import timezone
-from django.db import models
+from django.db import models, transaction
 from .models import Article, Category, ArticleLike, Comment, CommentLike, Tag
 from .serializers import ArticleSerializer, CategorySerializer, ArticleLikeSerializer, CommentSerializer, CommentLikeSerializer, TagSerializer
 from rest_framework.views import APIView
@@ -63,10 +63,15 @@ class CommentCreateView(APIView):
         
         serializer = CommentSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            comment = serializer.save(author=request.user, article=article)
-            print(f'✓ Comment created: {comment.id}')
-            print(f'  Content: {comment.content[:50]}...')
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            try:
+                with transaction.atomic():
+                    comment = serializer.save(author=request.user, article=article)
+                    print(f'✓ Comment created: {comment.id}')
+                    print(f'  Content: {comment.content[:50]}...')
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                print(f'✗ Database error: {str(e)}')
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             print(f'✗ Serializer errors: {serializer.errors}')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -214,12 +219,14 @@ class ArticleListCreateView(generics.ListCreateAPIView):
             print("Creating article with author:", self.request.user)  # Debug print
             print("Request data:", self.request.data)  # Debug print
             
-            # The category_id should be passed in the request data and handled by the serializer
-            serializer.save(author=self.request.user)
+            # Wrap in transaction to ensure atomic save
+            with transaction.atomic():
+                serializer.save(author=self.request.user)
+                print("✓ Article saved successfully")
                 
         except Exception as e:
             import logging
-            logging.error(f"Error creating article: {str(e)}")
+            logging.error(f"Error creating article: {str(e)}", exc_info=True)
             logging.error(f"Request data: {self.request.data}")
             raise
 

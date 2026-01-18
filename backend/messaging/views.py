@@ -2,6 +2,7 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from .models import Conversation, Message
 from .serializers import (
     ConversationSerializer,
@@ -140,13 +141,21 @@ class MessageViewSet(viewsets.ModelViewSet):
             else:
                 attachment_type = 'other'
 
-        message = Message.objects.create(
-            conversation=conversation,
-            sender=request.user,
-            content=content or '',
-            attachment=attachment,
-            attachment_type=attachment_type
-        )
+        try:
+            with transaction.atomic():
+                message = Message.objects.create(
+                    conversation=conversation,
+                    sender=request.user,
+                    content=content or '',
+                    attachment=attachment,
+                    attachment_type=attachment_type
+                )
+                print(f"✓ Message created: {message.id}")
 
-        serializer = self.get_serializer(message)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer = self.get_serializer(message)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(f"✗ Error creating message: {str(e)}")
+            import logging
+            logging.error(f"Message creation error: {str(e)}", exc_info=True)
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

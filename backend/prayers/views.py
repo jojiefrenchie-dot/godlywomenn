@@ -2,6 +2,7 @@ from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 from .models import Prayer, PrayerResponse, PrayerSupport, PrayerResponseLike
 from .serializers import PrayerSerializer, PrayerResponseSerializer
 
@@ -33,7 +34,15 @@ class PrayerListCreateView(generics.ListCreateAPIView):
         return [permissions.AllowAny()]
         
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        try:
+            with transaction.atomic():
+                serializer.save(author=self.request.user)
+                print(f"✓ Prayer created")
+        except Exception as e:
+            print(f"✗ Error creating prayer: {str(e)}")
+            import logging
+            logging.error(f"Prayer creation error: {str(e)}", exc_info=True)
+            raise
 
 class PrayerDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PrayerSerializer
@@ -62,7 +71,15 @@ class PrayerResponseCreateView(generics.CreateAPIView):
     
     def perform_create(self, serializer):
         prayer = get_object_or_404(Prayer, id=self.kwargs['prayer_id'])
-        serializer.save(author=self.request.user, prayer=prayer)
+        try:
+            with transaction.atomic():
+                serializer.save(author=self.request.user, prayer=prayer)
+                print(f"✓ Prayer response created")
+        except Exception as e:
+            print(f"✗ Error creating prayer response: {str(e)}")
+            import logging
+            logging.error(f"Prayer response creation error: {str(e)}", exc_info=True)
+            raise
 
 @api_view(['POST', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])

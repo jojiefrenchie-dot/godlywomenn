@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from django.db import models
+from django.db import models, transaction
 from .models import Listing
 from .serializers import ListingSerializer
 
@@ -24,7 +24,15 @@ class ListingListCreateView(generics.ListCreateAPIView):
         return [permissions.AllowAny()]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        try:
+            with transaction.atomic():
+                serializer.save(owner=self.request.user)
+                print(f"✓ Listing created: {serializer.data.get('id')}")
+        except Exception as e:
+            print(f"✗ Error creating listing: {str(e)}")
+            import logging
+            logging.error(f"Listing creation error: {str(e)}", exc_info=True)
+            raise
 
     def get_queryset(self):
         queryset = Listing.objects.all()
