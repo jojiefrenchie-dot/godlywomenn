@@ -63,22 +63,68 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend_project.wsgi.application'
 
-# Database - use PostgreSQL on Render, SQLite locally
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR}/db.sqlite3',
-        conn_max_age=600
-    )
-}
+# Database - use PostgreSQL on production, SQLite locally (with option to use PostgreSQL)
+# PostgreSQL connection string examples:
+# postgresql://user:password@host:port/dbname
+# postgres://user:password@host:port/dbname
+DB_URL = os.environ.get('DATABASE_URL')
 
-# Ensure SQLite database directory exists
-if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
-    db_path = DATABASES['default']['NAME']
-    if db_path and db_path != ':memory:':
-        db_dir = os.path.dirname(db_path)
-        if db_dir:
-            os.makedirs(db_dir, exist_ok=True)
-        print(f"[DB] Using SQLite at: {db_path}")
+if DB_URL:
+    # Production: Use DATABASE_URL environment variable
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DB_URL,
+            conn_max_age=600,
+            conn_health_checks=True,  # Enable connection health checks for PostgreSQL
+            default_transaction_isolation=1,  # Read Committed isolation level
+        )
+    }
+    db_engine = DATABASES['default']['ENGINE']
+    print(f"[DB] Using {db_engine.split('.')[-1]} database from DATABASE_URL")
+else:
+    # Local development: Try PostgreSQL first, fall back to SQLite
+    PG_HOST = os.environ.get('DB_HOST', 'localhost')
+    PG_PORT = os.environ.get('DB_PORT', '5432')
+    PG_NAME = os.environ.get('DB_NAME', 'godlywomen_db')
+    PG_USER = os.environ.get('DB_USER', 'postgres')
+    PG_PASSWORD = os.environ.get('DB_PASSWORD', '')
+    
+    # Try to use PostgreSQL
+    try:
+        import psycopg2
+        if PG_PASSWORD:
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': PG_NAME,
+                    'USER': PG_USER,
+                    'PASSWORD': PG_PASSWORD,
+                    'HOST': PG_HOST,
+                    'PORT': PG_PORT,
+                    'CONN_MAX_AGE': 600,
+                    'OPTIONS': {
+                        'connect_timeout': 10,
+                        'options': '-c default_transaction_isolation=read_committed',
+                    },
+                }
+            }
+            print(f"[DB] Using PostgreSQL at {PG_HOST}:{PG_PORT}/{PG_NAME}")
+        else:
+            raise ValueError("DB_PASSWORD not set for PostgreSQL")
+    except (ImportError, ValueError) as e:
+        # Fall back to SQLite
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+        db_path = DATABASES['default']['NAME']
+        if db_path and db_path != ':memory:':
+            db_dir = os.path.dirname(db_path)
+            if db_dir:
+                os.makedirs(db_dir, exist_ok=True)
+        print(f"[DB] Using SQLite at: {db_path} (reason: {str(e)})")
 
 AUTH_PASSWORD_VALIDATORS = []
 
