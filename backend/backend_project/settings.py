@@ -76,9 +76,13 @@ if DB_URL:
             default=DB_URL,
             conn_max_age=600,
             conn_health_checks=True,  # Enable connection health checks for PostgreSQL
-            default_transaction_isolation=1,  # Read Committed isolation level
         )
     }
+    # Set isolation level in OPTIONS if using PostgreSQL
+    if 'OPTIONS' not in DATABASES['default']:
+        DATABASES['default']['OPTIONS'] = {}
+    DATABASES['default']['OPTIONS']['isolation_level'] = 1  # Read Committed isolation level
+    
     db_engine = DATABASES['default']['ENGINE']
     print(f"[DB] Using {db_engine.split('.')[-1]} database from DATABASE_URL")
 else:
