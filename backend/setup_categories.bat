@@ -1,6 +1,0 @@
-@echo off
-echo Running migrations...
-python manage.py migrate
-echo Setting up default categories...
-python manage.py setup_default_categories
-echo Done!

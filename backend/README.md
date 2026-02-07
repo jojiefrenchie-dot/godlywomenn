@@ -1,31 +1,72 @@
-Django backend for Godlywomen (minimal local dev)
+# MongoDB/Node.js Backend for Godlywomen
 
-Quickstart (PowerShell, from project root):
+API Server built with Express, TypeScript, and MongoDB
 
-# 1. Create and activate venv
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+## Setup
 
-# 2. Install dependencies
-pip install -r requirements.txt
+```bash
+npm install
+```
 
-# 3. Run migrations
-python manage.py makemigrations
-python manage.py migrate
+## Environment Variables
 
-# 4. Create superuser (optional)
-python manage.py createsuperuser
+Create `.env`:
+```
+PORT=8000
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/godlywomen
+MONGODB_URI_PROD=your-mongodb-atlas-connection-string
+JWT_SECRET=your-jwt-secret-key
+JWT_REFRESH_SECRET=your-refresh-secret-key
+NEXTAUTH_SECRET=your-nextauth-secret
+```
 
-# 5. Run server
-python manage.py runserver 8000
+## Running
 
-API endpoints:
-- POST /api/auth/register/  -> { name, email, password }
-- POST /api/auth/token/     -> { email, password }  (returns access + refresh tokens)
-- GET  /api/auth/me/        -> auth required
-- GET/POST /api/articles/   -> list or create article (create requires auth header 'Authorization: Bearer <token>')
+Development:
+```bash
+npm run dev
+```
 
-Notes:
-- This uses sqlite for local dev. If you want Postgres, update DATABASES in backend_project/settings.py and install psycopg2-binary.
-- CORS is wide-open for development.
+Production:
+```bash
+npm run build
+npm start
+```
+
+## API Documentation
+
+See `/docs` for API specification
+
+### Authentication
+- POST `/api/auth/register` - Register new user
+- POST `/api/auth/login` - Login user
+- POST `/api/auth/refresh` - Refresh JWT token
+- POST `/api/auth/logout` - Logout user
+
+### Articles
+- GET `/api/articles` - List articles
+- POST `/api/articles` - Create article
+- GET `/api/articles/:id` - Get article
+- PATCH `/api/articles/:id` - Update article
+- DELETE `/api/articles/:id` - Delete article
+
+### Prayers
+- GET `/api/prayers` - List prayers
+- POST `/api/prayers` - Create prayer
+- GET `/api/prayers/:id` - Get prayer
+- PATCH `/api/prayers/:id` - Update prayer
+- DELETE `/api/prayers/:id` - Delete prayer
+
+### Marketplace
+- GET `/api/marketplace` - List items
+- POST `/api/marketplace` - Create listing
+- GET `/api/marketplace/:id` - Get listing
+- PATCH `/api/marketplace/:id` - Update listing
+- DELETE `/api/marketplace/:id` - Delete listing
+
+### Messaging
+- GET `/api/messaging/conversations` - List conversations
+- POST `/api/messaging/conversations` - Create conversation
+- GET `/api/messaging/messages` - List messages
+- POST `/api/messaging/messages` - Send message

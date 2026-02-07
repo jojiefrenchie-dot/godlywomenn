@@ -1,34 +1,23 @@
-FROM python:3.11-slim
+FROM node:20-alpine
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set work directory
 WORKDIR /app
 
-# Install Python dependencies
-COPY requirements_production.txt .
-RUN pip install --upgrade pip && \
-    pip install -r requirements_production.txt
+# Install dependencies
+COPY package*.json ./
+RUN npm ci
 
-# Copy project files
-COPY . .
+# Copy source
+COPY tsconfig.json ./
+COPY src ./src
 
-# Create necessary directories
-RUN mkdir -p /app/staticfiles /app/media
+# Build TypeScript
+RUN npm run build
 
-# Collect static files
-RUN python manage.py collectstatic --noinput || true
+# Create media directories
+RUN mkdir -p media/articles media/marketplace
 
 # Expose port
 EXPOSE 8000
 
-# Run gunicorn
-CMD ["gunicorn", "backend_project.wsgi", "--bind", "0.0.0.0:8000", "--workers", "4"]
+# Start application
+CMD ["npm", "start"]
