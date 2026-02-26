@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: godlywomenn-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py migrate
+    startCommand: gunicorn backend_project.wsgi
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: DEBUG
+        value: false
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+databases:
+  - name: godlywomenn-db
+    databaseName: godlywomenn_db
+    user: postgres
+    region: oregon
+    plan: free
