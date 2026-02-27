@@ -1,0 +1,8 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build:frontend",
+  "installCommand": "npm install && npm install --prefix frontend",
+  "env": {
+    "NEXT_PUBLIC_BACKEND_API": "@godlywomenn-backend-url"
+  }
+}

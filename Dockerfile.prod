@@ -1,0 +1,35 @@
+FROM node:20 AS builder
+
+WORKDIR /app
+
+# Install frontend dependencies
+COPY frontend/package*.json ./frontend/
+RUN npm install --prefix frontend
+
+# Build frontend
+COPY frontend ./frontend
+RUN npm run build --prefix frontend
+
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install backend production dependencies
+COPY backend/package*.json ./
+RUN npm ci --only=production
+
+# Copy backend source
+COPY backend/src ./src
+COPY backend/tsconfig.json ./
+
+# Build backend
+RUN npm run build
+
+# Copy frontend build
+COPY --from=builder /app/frontend/.next ./frontend/.next
+COPY --from=builder /app/frontend/public ./frontend/public
+
+EXPOSE 8000
+
+CMD ["npm", "start"]

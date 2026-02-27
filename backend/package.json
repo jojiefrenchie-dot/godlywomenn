@@ -1,0 +1,28 @@
+{
+  "name": "godlywomenn-backend",
+  "version": "1.0.0",
+  "description": "Express.js backend for Godly Women platform",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_ENV=development tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "build:watch": "tsc --watch"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "pg": "^8.11.3",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/pg": "^8.11.6",
+    "typescript": "^5.2.2",
+    "tsx": "^4.7.0"
+  }
+}

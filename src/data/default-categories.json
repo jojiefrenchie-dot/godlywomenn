@@ -1,8 +1,0 @@
-[
-  { "id": "1", "name": "Testimony", "slug": "testimony", "description": "Share your personal stories of faith and God's work in your life" },
-  { "id": "2", "name": "Praise", "slug": "praise", "description": "Expressions of worship and thanksgiving to God" },
-  { "id": "3", "name": "Bible Verse", "slug": "bible-verse", "description": "Share and reflect on meaningful scripture passages" },
-  { "id": "4", "name": "Song/Psalms", "slug": "song-psalms", "description": "Spiritual songs, hymns, and psalm interpretations" },
-  { "id": "5", "name": "Personal Observation", "slug": "personal-observation", "description": "Share your insights and reflections on faith and life" },
-  { "id": "6", "name": "Other", "slug": "other", "description": "Other spiritual and faith-related content" }
-]

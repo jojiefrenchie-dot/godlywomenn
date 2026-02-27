@@ -1,39 +1,32 @@
 version: '3.8'
 
 services:
-  mongodb:
-    image: mongo:7
-    ports:
-      - "27017:27017"
+  postgres:
+    image: postgres:15-alpine
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password
+      POSTGRES_USER: godly_user
+      POSTGRES_PASSWORD: godly_password
+      POSTGRES_DB: godlywomenn
+    ports:
+      - "5432:5432"
     volumes:
-      - mongodb_data:/data/db
-    networks:
-      - godlywomen
+      - postgres_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend
-    ports:
-      - "8000:8000"
+    build: .
     environment:
       NODE_ENV: development
-      MONGODB_URI: mongodb://admin:password@mongodb:27017/godlywomen?authSource=admin
-      JWT_SECRET: dev-secret-key
-      JWT_REFRESH_SECRET: dev-refresh-secret
+      PORT: 8000
+      DATABASE_URL: postgresql://godly_user:godly_password@postgres:5432/godlywomenn
+      JWT_SECRET: development-secret-key
+      JWT_REFRESH_SECRET: development-refresh-secret
       FRONTEND_URL: http://localhost:3000
+    ports:
+      - "8000:8000"
     depends_on:
-      - mongodb
+      - postgres
     volumes:
       - ./backend/src:/app/src
-      - ./backend/media:/app/media
-    networks:
-      - godlywomen
 
 volumes:
-  mongodb_data:
-
-networks:
-  godlywomen:
-    driver: bridge
+  postgres_data:
