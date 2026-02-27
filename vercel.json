@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "env": {
+    "NEXT_PUBLIC_BACKEND_API": "https://godlywomenn.onrender.com",
+    "NODE_ENV": "production"
+  }
+}
