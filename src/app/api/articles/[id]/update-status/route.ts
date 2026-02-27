@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDjangoApiUrl } from '@/lib/api';
+import { getBackendApiUrl } from '@/lib/api';
 
 export async function PATCH(
   request: NextRequest,
@@ -21,7 +21,7 @@ export async function PATCH(
     }
 
     // Make request to Django API
-    const response = await fetch(getDjangoApiUrl(`/api/articles/${params.id}/`), {
+    const response = await fetch(getBackendApiUrl(`/api/articles/${params.id}/`), {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AI API Client
  * Integrates with Django backend AI endpoints
  * Uses FLAN-T5-Large and Detoxify models
@@ -86,3 +86,4 @@ export async function moderateText(text: string): Promise<{
     throw error instanceof Error ? error : new Error(String(error));
   }
 }
+

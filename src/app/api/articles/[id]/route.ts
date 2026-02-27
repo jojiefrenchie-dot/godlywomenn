@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { getDjangoApiUrl } from '@/lib/api';
+import { getBackendApiUrl } from '@/lib/api';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -20,7 +20,7 @@ export async function DELETE(req: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const resp = await fetch(getDjangoApiUrl(`/api/articles/${encodeURIComponent(id)}/`), {
+    const resp = await fetch(getBackendApiUrl(`/api/articles/${encodeURIComponent(id)}/`), {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -49,7 +49,7 @@ export async function PATCH(req: NextRequest, context: RouteContext) {
     const authHeader = (req as any).headers?.get?.('Authorization') || '';
     const token = authHeader.replace('Bearer ', '');
 
-    const resp = await fetch(getDjangoApiUrl(`/api/articles/${id}/`), {
+    const resp = await fetch(getBackendApiUrl(`/api/articles/${id}/`), {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

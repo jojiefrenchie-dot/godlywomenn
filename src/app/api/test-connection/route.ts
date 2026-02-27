@@ -1,4 +1,4 @@
-const DJANGO_API = process.env.NEXT_PUBLIC_DJANGO_API || 'https://godlywomenn.onrender.com';
+﻿const DJANGO_API = process.env.NEXT_PUBLIC_DJANGO_API || 'https://godlywomenn.onrender.com';
 const NEXT_API = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export async function GET() {
@@ -51,3 +51,4 @@ export async function GET() {
     }), { status: 500 });
   }
 }
+

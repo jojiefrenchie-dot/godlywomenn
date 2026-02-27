@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 
-import { getDjangoApiUrl } from '@/lib/api';
+import { getBackendApiUrl } from '@/lib/api';
 
 export async function POST(
   req: NextRequest,
@@ -19,7 +19,7 @@ export async function POST(
 
     const body = await req.json();
 
-    const resp = await fetch(getDjangoApiUrl(`/api/articles/comment/${pk}/reply/`), {
+    const resp = await fetch(getBackendApiUrl(`/api/articles/comment/${pk}/reply/`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

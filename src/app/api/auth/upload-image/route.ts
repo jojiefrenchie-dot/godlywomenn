@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getApiUrl } from '@/lib/api-url';
 
 export async function POST(req: Request) {
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log('[AUTH_UPLOAD_IMAGE_POST] ✓ Image uploaded:', data);
+    console.log('[AUTH_UPLOAD_IMAGE_POST] âœ“ Image uploaded:', data);
     return NextResponse.json(data);
   } catch (error) {
     console.error('[AUTH_UPLOAD_IMAGE_POST]', error);
@@ -73,3 +73,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

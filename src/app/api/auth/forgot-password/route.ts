@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 
 const DJANGO_API = process.env.NEXT_PUBLIC_DJANGO_API || 'https://godlywomenn.onrender.com';
 
@@ -46,3 +46,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: `Error processing request: ${errorMsg}` }, { status: 500 });
   }
 }
+

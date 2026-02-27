@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { getApiUrl } from "@/lib/api-url";
 
 export async function POST(req: Request) {
@@ -45,3 +45,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

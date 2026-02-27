@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 
-import { getDjangoApiUrl } from '@/lib/api';
+import { getBackendApiUrl } from '@/lib/api';
 
 export async function POST(
   req: NextRequest,
@@ -17,7 +17,7 @@ export async function POST(
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const resp = await fetch(getDjangoApiUrl(`/api/articles/comment/${pk}/like/`), {
+    const resp = await fetch(getBackendApiUrl(`/api/articles/comment/${pk}/like/`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const resp = await fetch(getDjangoApiUrl(`/api/articles/comment/${pk}/like/`), {
+    const resp = await fetch(getBackendApiUrl(`/api/articles/comment/${pk}/like/`), {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

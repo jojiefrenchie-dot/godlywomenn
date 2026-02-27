@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 
-import { getDjangoApiUrl } from '@/lib/api';
+import { getBackendApiUrl } from '@/lib/api';
 
 export async function DELETE(
   req: NextRequest,
@@ -17,7 +17,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const djangoUrl = getDjangoApiUrl(`/api/articles/comment/${pk}/delete/`);
+    const djangoUrl = getBackendApiUrl(`/api/articles/comment/${pk}/delete/`);
     
     const resp = await fetch(djangoUrl, {
       method: 'DELETE',

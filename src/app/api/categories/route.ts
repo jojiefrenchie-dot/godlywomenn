@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -34,7 +34,7 @@ export async function GET() {
     }
 
     if (djangoOrigin === nextOrigin) {
-      console.warn('DJANGO_API appears to point to the same origin as NEXT_API — using default categories to avoid recursive proxy');
+      console.warn('DJANGO_API appears to point to the same origin as NEXT_API â€” using default categories to avoid recursive proxy');
       const fallback = await readDefaultCategories();
       return NextResponse.json(fallback, { status: 200, headers: { 'X-Categories-Fallback': 'true' } });
     }
@@ -111,3 +111,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create category' }, { status: 500 });
   }
 }
+

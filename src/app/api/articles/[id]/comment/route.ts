@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { getDjangoApiUrl } from '@/lib/api';
+import { getBackendApiUrl } from '@/lib/api';
 
 export async function POST(
   req: NextRequest,
@@ -16,10 +16,10 @@ export async function POST(
 
     const body = await req.json();
     console.log('Comment request body:', body);
-    console.log('Target URL:', getDjangoApiUrl(`/api/articles/${id}/comment/`));
+    console.log('Target URL:', getBackendApiUrl(`/api/articles/${id}/comment/`));
     console.log('Auth token:', token ? 'present' : 'missing');
 
-    const resp = await fetch(getDjangoApiUrl(`/api/articles/${id}/comment/`), {
+    const resp = await fetch(getBackendApiUrl(`/api/articles/${id}/comment/`), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

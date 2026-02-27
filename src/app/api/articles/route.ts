@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { getBackendApiUrl, fetchWithAuth } from '@/lib/api';
 
 export async function POST(req: Request) {
@@ -141,3 +141,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Failed to proxy request' }, { status: 500 });
   }
 }
+

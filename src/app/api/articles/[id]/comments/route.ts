@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { getDjangoApiUrl } from '@/lib/api';
+import { getBackendApiUrl } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +19,7 @@ export async function GET(
 
     try {
       const resp = await fetch(
-        getDjangoApiUrl(`/api/articles/${id}/comments/`),
+        getBackendApiUrl(`/api/articles/${id}/comments/`),
         {
           method: 'GET',
           headers: {
