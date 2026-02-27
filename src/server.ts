@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import connectDB from './config/database';
+import { initializeDatabase, initializeTables, closeDatabase } from './config/database';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 // Routes
@@ -52,18 +52,31 @@ app.use('/api/messaging', messagingRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Connect to database and start server
+// Initialize database and start server
 const startServer = async () => {
   try {
-    await connectDB();
+    const db = await initializeDatabase();
+    if (db) {
+      await initializeTables();
+      console.log('✅ PostgreSQL database initialized');
+    } else {
+      console.log('📝 Using in-memory storage (no database configured)');
+    }
   } catch (error) {
-    console.warn('⚠️ Warning: Could not connect to MongoDB, continuing without database');
+    console.warn('⚠️ Warning: Could not connect to database, continuing with in-memory storage');
   }
   
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Server running on port ${PORT}`);
   });
 };
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('Shutting down gracefully...');
+  await closeDatabase();
+  process.exit(0);
+});
 
 startServer();
 

@@ -2,7 +2,8 @@ import { Response } from 'express';
 import { generateTokens, verifyRefreshToken } from '../config/auth';
 import { AuthRequest } from '../config/auth';
 
-// In-memory user storage for testing (no DB required)
+// Database will be injected here - for now using empty Map for SQL preparation
+// This Map will be replaced by actual database queries (PostgreSQL on Render)
 const mockUsers: Map<string, any> = new Map();
 
 export const register = async (req: AuthRequest, res: Response): Promise<void> => {
