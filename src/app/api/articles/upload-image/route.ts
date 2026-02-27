@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDjangoApiUrl } from '@/lib/api';
+import { getBackendApiUrl } from '@/lib/api';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     // Forward the request to Django
-    const response = await fetch(getDjangoApiUrl('/api/articles/upload-image/'), {
+    const response = await fetch(getBackendApiUrl('/api/articles/upload-image/'), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

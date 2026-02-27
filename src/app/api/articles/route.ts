@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDjangoApiUrl, fetchWithAuth } from '@/lib/api';
+import { getBackendApiUrl, fetchWithAuth } from '@/lib/api';
 
 export async function POST(req: Request) {
   try {
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
     try {
       // Use direct fetch here so we can read Django's validation errors (400)
-      const resp = await fetch(getDjangoApiUrl('/api/articles/'), {
+      const resp = await fetch(getBackendApiUrl('/api/articles/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export async function GET(req: Request) {
     // Build target URL with query string forwarded
     const requestUrl = new URL(req.url);
     const search = requestUrl.search || '';
-    const target = getDjangoApiUrl(`/api/articles/${search}`);
+    const target = getBackendApiUrl(`/api/articles/${search}`);
 
     // Get optional Bearer token from Authorization header
     let token: string | undefined;
