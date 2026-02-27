@@ -38,7 +38,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const auth_1 = require("../config/auth");
-const storage_1 = require("../config/storage");
 const authController = __importStar(require("../controllers/authController"));
 const router = express_1.default.Router();
 router.post('/register', authController.register);
@@ -46,7 +45,7 @@ router.post('/login', authController.login);
 router.post('/refresh', authController.refresh);
 router.post('/logout', auth_1.authMiddleware, authController.logout);
 router.get('/me', auth_1.authMiddleware, authController.getCurrentUser);
-router.patch('/me', auth_1.authMiddleware, storage_1.upload.single('image'), authController.updateUser);
+router.patch('/me', auth_1.authMiddleware, authController.updateUser);
 router.get('/:id', authController.getUser);
 exports.default = router;
 //# sourceMappingURL=auth.js.map

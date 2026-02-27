@@ -1,23 +1,19 @@
-FROM node:20-alpine
-
+# Multi-stage build
+FROM node:18-alpine AS frontend-builder
 WORKDIR /app
-
-# Install dependencies
 COPY package*.json ./
 RUN npm ci
-
-# Copy source
-COPY tsconfig.json ./
-COPY src ./src
-
-# Build TypeScript
+COPY . .
 RUN npm run build
 
-# Create media directories
-RUN mkdir -p media/articles media/marketplace
-
-# Expose port
-EXPOSE 8000
-
-# Start application
+# Next.js production runtime
+FROM node:18-alpine AS frontend
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --only=production
+COPY --from=frontend-builder /app/.next ./.next
+COPY --from=frontend-builder /app/public ./public
+COPY next.config.ts ./
+EXPOSE 3000
 CMD ["npm", "start"]

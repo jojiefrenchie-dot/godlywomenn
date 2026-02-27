@@ -1,0 +1,208 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Account for fixed header */
+  background-color: #ffffff;
+}
+
+:root {
+  color-scheme: light;
+  /* Main colors */
+  --primary: #dc143c;
+  --primary-light: #f75270;
+  --pink-light: #f7cac9;
+  --peach: #fdebd0;
+  
+  /* Text colors */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  
+  /* Backgrounds */
+  --bg-white: #ffffff;
+  --bg-light: #f8f9fa;
+  --bg-gradient: linear-gradient(to right, #dc143c, #f75270);
+  
+  /* Borders */
+  --border-light: #f0f0f0;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+html, body {
+  background-color: #ffffff !important;
+  color: #333333;
+}
+
+/* Base styling */
+main {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+/* Card styling */
+.card {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: #f7cac9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Button styling */
+.btn-primary {
+  background: linear-gradient(to right, #dc143c, #f75270);
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #dc143c;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid #f0f0f0;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #fdebd0;
+  border-color: #f7cac9;
+}
+
+/* Card and container backgrounds */
+.card, 
+.container-light {
+  background: #ffffff;
+}
+
+body {
+  background: #ffffff;
+  color: #333333;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: #ffffff;
+  color: #333333;
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Simple utility helpers used by the landing page */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(220, 20, 60, 0.06);
+  border: 1px solid rgba(247, 202, 201, 0.2);
+}
+
+.card:hover {
+  border-color: rgba(247, 202, 201, 0.4);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  padding: 0.625rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--primary);
+  padding: 0.5rem 1.15rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--secondary);
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background: var(--tertiary);
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+
+/* Responsive typography */
+h1.hero {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1.2;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Mobile menu animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.fade-in {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.slide-in-from-bottom-2 {
+  animation: slideInFromBottom 0.2s ease-in-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #05060a;
+    --foreground: #e8eef8;
+    --card: #081123;
+    --muted: #9aa5b1;
+  }
+  body {
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(168,155,230,0.06), transparent), var(--background);
+  }
+}

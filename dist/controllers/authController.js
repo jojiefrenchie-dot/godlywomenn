@@ -180,35 +180,33 @@ const getUser = async (req, res) => {
     }
 };
 exports.getUser = getUser;
-try {
-    const { email, password, name } = req.body;
-    if (!email || !password) {
-        res.status(400).json({ message: 'Email and password are required' });
-        return;
-    }
-    if (mockUsers.has(email)) {
-        res.status(400).json({ message: 'Email already registered' });
-        return;
-    }
-    const userId = 'user_' + Date.now();
-    mockUsers.set(email, {
-        id: userId,
-        email,
-        password,
-        name: name || 'Test User'
-    });
-    const { accessToken, refreshToken } = (0, auth_1.generateTokens)(userId, email);
-    res.status(201).json({
-        message: 'User registered successfully',
-        user: {
-            id: userId,
-            email: email,
-            name: name || 'Test User'
-        },
-        accessToken,
-        refreshToken
-    });
+if (!email || !password) {
+    res.status(400).json({ message: 'Email and password are required' });
+    return;
 }
+if (mockUsers.has(email)) {
+    res.status(400).json({ message: 'Email already registered' });
+    return;
+}
+const userId = 'user_' + Date.now();
+mockUsers.set(email, {
+    id: userId,
+    email,
+    password,
+    name: name || 'Test User'
+});
+const { accessToken, refreshToken } = (0, auth_1.generateTokens)(userId, email);
+res.status(201).json({
+    message: 'User registered successfully',
+    user: {
+        id: userId,
+        email: email,
+        name: name || 'Test User'
+    },
+    accessToken,
+    refreshToken
+});
+try { }
 catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ message: 'Registration failed' });

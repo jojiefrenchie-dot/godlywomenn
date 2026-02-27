@@ -1,3 +1,2 @@
-declare const connectDB: () => Promise<void>;
-export default connectDB;
+export default function connectDB(): Promise<void>;
 //# sourceMappingURL=database.d.ts.map

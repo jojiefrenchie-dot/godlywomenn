@@ -203,8 +203,6 @@ export const getUser = async (req: AuthRequest, res: Response): Promise<void> =>
     res.status(500).json({ message: 'User not found' });
   }
 };
-  try {
-    const { email, password, name } = req.body;
 
     if (!email || !password) {
       res.status(400).json({ message: 'Email and password are required' });
