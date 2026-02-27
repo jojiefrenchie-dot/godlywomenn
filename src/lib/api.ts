@@ -1,15 +1,15 @@
 // api.ts
-// For production: Set NEXT_PUBLIC_APP_URL and NEXT_PUBLIC_DJANGO_API in environment
+// For production: Set NEXT_PUBLIC_APP_URL and NEXT_PUBLIC_BACKEND_API in environment
 // For development: Uses localhost defaults
 export const NEXT_API = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-export const DJANGO_API = process.env.NEXT_PUBLIC_DJANGO_API || 'http://localhost:8000';
+export const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:8000';
 
 export function getNextApiUrl(path: string) {
   return `${NEXT_API}${path}`;
 }
 
-export function getDjangoApiUrl(path: string) {
-  return `${DJANGO_API}${path}`;
+export function getBackendApiUrl(path: string) {
+  return `${BACKEND_API}${path}`;
 }
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import TiptapEditor from "@/app/components/TiptapEditor";
 import { getCategories, ArticleCategory } from "@/lib/articles";
-import { getDjangoApiUrl, fetchWithAuth } from '@/lib/api';
+import { getBackendApiUrl, fetchWithAuth } from '@/lib/api';
 
 export default function CreateArticleClient() {
   const router = useRouter();
@@ -50,7 +50,7 @@ export default function CreateArticleClient() {
       };
       if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-      const response = await fetchWithAuth(getDjangoApiUrl('/api/articles/generate/'), {
+      const response = await fetchWithAuth(getBackendApiUrl('/api/articles/generate/'), {
         method: 'POST',
         headers,
         body: JSON.stringify({
