@@ -1,41 +1,36 @@
-import mongoose, { Document } from 'mongoose';
-export interface IPrayer extends Document {
+export interface IPrayer {
+    _id?: string;
     title: string;
     content: string;
     prayer_type: 'request' | 'testimony' | 'praise';
     is_anonymous: boolean;
     is_public: boolean;
-    author: mongoose.Types.ObjectId;
+    author: string;
     created_at: Date;
     updated_at: Date;
 }
-export interface IPrayerResponse extends Document {
-    prayer: mongoose.Types.ObjectId;
-    author: mongoose.Types.ObjectId;
+export interface IPrayerResponse {
+    _id?: string;
+    prayer: string;
+    author: string;
     content: string;
     created_at: Date;
     updated_at: Date;
 }
-export interface IPrayerSupport extends Document {
-    prayer: mongoose.Types.ObjectId;
-    user: mongoose.Types.ObjectId;
+export interface IPrayerSupport {
+    _id?: string;
+    prayer: string;
+    user: string;
     created_at: Date;
 }
-export interface IPrayerResponseLike extends Document {
-    response: mongoose.Types.ObjectId;
-    user: mongoose.Types.ObjectId;
+export interface IPrayerResponseLike {
+    _id?: string;
+    response: string;
+    user: string;
     created_at: Date;
 }
-export declare const Prayer: mongoose.Model<IPrayer, {}, {}, {}, mongoose.Document<unknown, {}, IPrayer> & IPrayer & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
-export declare const PrayerResponse: mongoose.Model<IPrayerResponse, {}, {}, {}, mongoose.Document<unknown, {}, IPrayerResponse> & IPrayerResponse & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
-export declare const PrayerSupport: mongoose.Model<IPrayerSupport, {}, {}, {}, mongoose.Document<unknown, {}, IPrayerSupport> & IPrayerSupport & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
-export declare const PrayerResponseLike: mongoose.Model<IPrayerResponseLike, {}, {}, {}, mongoose.Document<unknown, {}, IPrayerResponseLike> & IPrayerResponseLike & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
+export declare const Prayer: any;
+export declare const PrayerResponse: any;
+export declare const PrayerSupport: any;
+export declare const PrayerResponseLike: any;
 //# sourceMappingURL=Prayer.d.ts.map

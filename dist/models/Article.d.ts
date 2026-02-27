@@ -1,11 +1,11 @@
-import mongoose, { Document } from 'mongoose';
-export interface IArticle extends Document {
+export interface IArticle {
+    _id?: string;
     title: string;
     slug: string;
     content: string;
     excerpt?: string;
     featured_image?: string;
-    author: mongoose.Types.ObjectId;
+    author: string;
     category: string;
     status: 'draft' | 'published';
     view_count: number;
@@ -13,42 +13,36 @@ export interface IArticle extends Document {
     updated_at: Date;
     published_at?: Date;
 }
-export interface IComment extends Document {
-    article: mongoose.Types.ObjectId;
-    author: mongoose.Types.ObjectId;
+export interface IComment {
+    _id?: string;
+    article: string;
+    author: string;
     content: string;
-    parent?: mongoose.Types.ObjectId;
+    parent?: string;
     created_at: Date;
     updated_at: Date;
 }
-export interface IArticleLike extends Document {
-    user: mongoose.Types.ObjectId;
-    article: mongoose.Types.ObjectId;
+export interface IArticleLike {
+    _id?: string;
+    user: string;
+    article: string;
     created_at: Date;
 }
-export interface IArticleView extends Document {
-    user: mongoose.Types.ObjectId;
-    article: mongoose.Types.ObjectId;
+export interface IArticleView {
+    _id?: string;
+    user: string;
+    article: string;
     created_at: Date;
 }
-export interface ICommentLike extends Document {
-    user: mongoose.Types.ObjectId;
-    comment: mongoose.Types.ObjectId;
+export interface ICommentLike {
+    _id?: string;
+    user: string;
+    comment: string;
     created_at: Date;
 }
-export declare const Article: mongoose.Model<IArticle, {}, {}, {}, mongoose.Document<unknown, {}, IArticle> & IArticle & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
-export declare const Comment: mongoose.Model<IComment, {}, {}, {}, mongoose.Document<unknown, {}, IComment> & IComment & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
-export declare const ArticleLike: mongoose.Model<IArticleLike, {}, {}, {}, mongoose.Document<unknown, {}, IArticleLike> & IArticleLike & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
-export declare const ArticleView: mongoose.Model<IArticleView, {}, {}, {}, mongoose.Document<unknown, {}, IArticleView> & IArticleView & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
-export declare const CommentLike: mongoose.Model<ICommentLike, {}, {}, {}, mongoose.Document<unknown, {}, ICommentLike> & ICommentLike & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
+export declare const Article: any;
+export declare const Comment: any;
+export declare const ArticleLike: any;
+export declare const ArticleView: any;
+export declare const CommentLike: any;
 //# sourceMappingURL=Article.d.ts.map

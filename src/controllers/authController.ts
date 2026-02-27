@@ -1,11 +1,208 @@
 import { Response } from 'express';
-import { generateTokens } from '../config/auth';
+import { generateTokens, verifyRefreshToken } from '../config/auth';
 import { AuthRequest } from '../config/auth';
 
 // In-memory user storage for testing (no DB required)
 const mockUsers: Map<string, any> = new Map();
 
 export const register = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { email, password, name } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({ message: 'Email and password are required' });
+      return;
+    }
+
+    if (mockUsers.has(email)) {
+      res.status(400).json({ message: 'Email already registered' });
+      return;
+    }
+
+    const userId = 'user_' + Date.now();
+    mockUsers.set(email, {
+      id: userId,
+      email,
+      password,
+      name: name || 'Test User'
+    });
+
+    const { accessToken, refreshToken } = generateTokens(userId, email);
+
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        id: userId,
+        email: email,
+        name: name || 'Test User'
+      },
+      access: accessToken,
+      refresh: refreshToken
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Registration failed' });
+  }
+};
+
+export const login = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({ message: 'Email and password are required' });
+      return;
+    }
+
+    const user = mockUsers.get(email);
+
+    if (!user || user.password !== password) {
+      res.status(401).json({ message: 'Invalid credentials' });
+      return;
+    }
+
+    const { accessToken,refreshToken } = generateTokens(user.id, email);
+
+    res.json({
+      message: 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      },
+      access: accessToken,
+      refresh: refreshToken
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Login failed' });
+  }
+};
+
+export const refresh = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      res.status(400).json({ message: 'Refresh token is required' });
+      return;
+    }
+
+    const decoded = verifyRefreshToken(refreshToken);
+
+    if (!decoded) {
+      res.status(401).json({ message: 'Invalid refresh token' });
+      return;
+    }
+
+    const user = Array.from(mockUsers.values()).find((u: any) => u.id === decoded.id);
+
+    if (!user) {
+      res.status(401).json({ message: 'User not found' });
+      return;
+    }
+
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens(user.id, user.email);
+
+    res.json({
+      access: accessToken,
+      refresh: newRefreshToken
+    });
+  } catch (error) {
+    console.error('Refresh error:', error);
+    res.status(500).json({ message: 'Token refresh failed' });
+  }
+};
+
+export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
+  res.json({ message: 'Logout successful' });
+};
+
+export const getCurrentUser = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+
+    if (!userId || !userEmail) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const user = mockUsers.get(userEmail);
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      name: user.name
+    });
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({ message: 'Failed to get user' });
+  }
+};
+
+export const updateUser = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const userEmail = req.user?.email;
+    const { name } = req.body;
+
+    if (!userId || !userEmail) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    const user = mockUsers.get(userEmail);
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    if (name) {
+      user.name = name;
+    }
+
+    res.json({
+      message: 'User updated successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name
+      }
+    });
+  } catch (error) {
+    console.error('Update user error:', error);
+    res.status(500).json({ message: 'Failed to update user' });
+  }
+};
+
+export const getUser = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+
+    const user = Array.from(mockUsers.values()).find((u: any) => u.id === id);
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      name: user.name
+    });
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({ message: 'User not found' });
+  }
+};
   try {
     const { email, password, name } = req.body;
 

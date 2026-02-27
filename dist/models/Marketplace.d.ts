@@ -1,6 +1,6 @@
-import mongoose, { Document } from 'mongoose';
-export interface IMarketplaceListing extends Document {
-    owner: mongoose.Types.ObjectId;
+export interface IMarketplaceListing {
+    _id?: string;
+    owner: string;
     title: string;
     description: string;
     price?: string;
@@ -13,8 +13,6 @@ export interface IMarketplaceListing extends Document {
     created_at: Date;
     updated_at: Date;
 }
-declare const _default: mongoose.Model<IMarketplaceListing, {}, {}, {}, mongoose.Document<unknown, {}, IMarketplaceListing> & IMarketplaceListing & {
-    _id: mongoose.Types.ObjectId;
-}, any>;
+declare const _default: any;
 export default _default;
 //# sourceMappingURL=Marketplace.d.ts.map

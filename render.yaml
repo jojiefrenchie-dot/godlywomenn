@@ -1,20 +1,18 @@
 services:
   - type: web
     name: godlywomenn-api
-    env: python
+    env: node
     plan: free
-    buildCommand: pip install -r requirements.txt && python manage.py migrate
-    startCommand: gunicorn backend_project.wsgi
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11
-      - key: DEBUG
-        value: false
-      - key: ALLOWED_HOSTS
-        value: .onrender.com
-databases:
-  - name: godlywomenn-db
-    databaseName: godlywomenn_db
-    user: postgres
-    region: oregon
-    plan: free
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: ${JWT_SECRET}
+      - key: JWT_REFRESH_SECRET
+        value: ${JWT_REFRESH_SECRET}
+      - key: FRONTEND_URL
+        value: https://godlywomenn.vercel.app
