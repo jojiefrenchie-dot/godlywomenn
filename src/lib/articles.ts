@@ -20,6 +20,7 @@ export interface Article {
   featured_image: string;
   category_id: string;
   author_id: string;
+  status?: string;
   created_at: string;
   updated_at: string;
   tags: ArticleTag[];
