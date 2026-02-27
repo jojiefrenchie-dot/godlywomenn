@@ -19,10 +19,12 @@ export interface Article {
   content: string;
   featured_image: string;
   category_id: string;
+  category?: ArticleCategory;
   author_id: string;
   status?: string;
   created_at: string;
   updated_at: string;
+  published_at?: string;
   tags: ArticleTag[];
 }
 
